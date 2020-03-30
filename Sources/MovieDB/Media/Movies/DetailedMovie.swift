@@ -1,0 +1,78 @@
+
+import Foundation
+import GraphZahl
+import NIO
+
+class DetailedMovie: Movie {
+    enum CodingKeys: String, CodingKey {
+        case budget, genres, homepage
+        case imdbID = "imdb_id"
+        case productionCompanies = "production_companies"
+        case productionCountries = "production_countries"
+        case revenue, runtime
+        case spokenLanguages = "spoken_languages"
+        case status, tagline
+    }
+
+    let budget: Int
+    let genres: [Genre]
+//    let homepage: URL?
+    let imdbID: String
+    let productionCompanies: [ProductionCompany]
+    let productionCountries: [ProductionCountry]
+    let revenue, runtime: Int
+    let spokenLanguages: [SpokenLanguage]
+    let status, tagline: String
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        budget = try container.decode(Int.self, forKey: .budget)
+        genres = try container.decode([Genre].self, forKey: .genres)
+//        homepage = try container.decode(URL?.self, forKey: .homepage)
+        imdbID = try container.decode(String.self, forKey: .imdbID)
+        productionCompanies = try container.decode([ProductionCompany].self, forKey: .productionCompanies)
+        productionCountries = try container.decode([ProductionCountry].self, forKey: .productionCountries)
+        revenue = try container.decode(Int.self, forKey: .revenue)
+        runtime = try container.decode(Int.self, forKey: .runtime)
+        spokenLanguages = try container.decode([SpokenLanguage].self, forKey: .spokenLanguages)
+        status = try container.decode(String.self, forKey: .status)
+        tagline = try container.decode(String.self, forKey: .tagline)
+        try super.init(from: decoder)
+    }
+}
+
+class Genre: Codable, GraphQLObject {
+    let id: Int
+    let name: String
+}
+
+class ProductionCompany: Codable {
+    let id: Int
+    let logoPath: String?
+    let name, originCountry: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case logoPath = "logo_path"
+        case name
+        case originCountry = "origin_country"
+    }
+}
+
+class ProductionCountry: Codable, GraphQLObject {
+    let iso3166_1, name: String
+
+    enum CodingKeys: String, CodingKey {
+        case iso3166_1 = "iso_3166_1"
+        case name
+    }
+}
+
+class SpokenLanguage: Codable, GraphQLObject {
+    let iso639_1, name: String
+
+    enum CodingKeys: String, CodingKey {
+        case iso639_1 = "iso_639_1"
+        case name
+    }
+}
