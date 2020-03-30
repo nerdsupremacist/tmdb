@@ -10,7 +10,7 @@ class CastCredit<Value: Decodable & ConcreteResolvable & OutputResolvable>: Base
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: CastCredit<Value>.CodingKeys.self)
         character = try container.decode(String.self, forKey: .character)
         try super.init(from: decoder)
     }

@@ -12,7 +12,7 @@ class CrewCredit<Value: Decodable & ConcreteResolvable & OutputResolvable>: Base
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: CrewCredit<Value>.CodingKeys.self)
         department = try container.decode(String.self, forKey: .department)
         job = try container.decode(String.self, forKey: .job)
         try super.init(from: decoder)

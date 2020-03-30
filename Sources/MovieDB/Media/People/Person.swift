@@ -13,7 +13,7 @@ class Person: BasicPerson {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: Person.CodingKeys.self)
         isAdult = try container.decode(Bool.self, forKey: .isAdult)
         popularityIndex = try container.decode(Double.self, forKey: .popularityIndex)
         try super.init(from: decoder)

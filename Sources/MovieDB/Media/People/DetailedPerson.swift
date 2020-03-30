@@ -26,7 +26,7 @@ class DetailedPerson: Person {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: DetailedPerson.CodingKeys.self)
         birthday = try container.decode(Date?.self, forKey: .birthday)
         knownForDepartment = try container.decode(String.self, forKey: .knownForDepartment)
         deathday = try container.decode(Date?.self, forKey: .deathday)

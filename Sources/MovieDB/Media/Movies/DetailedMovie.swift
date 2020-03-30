@@ -25,7 +25,7 @@ class DetailedMovie: Movie {
     let status, tagline: String
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: DetailedMovie.CodingKeys.self)
         budget = try container.decode(Int.self, forKey: .budget)
         genres = try container.decode([Genre].self, forKey: .genres)
 //        homepage = try container.decode(URL?.self, forKey: .homepage)

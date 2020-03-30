@@ -35,7 +35,7 @@ class DetailedTVShow: TVShow {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: DetailedTVShow.CodingKeys.self)
         createdBy = try container.decode([BaseCredit<BasicPerson>].self, forKey: .createdBy)
         episodeRunTime = try container.decode([Int].self, forKey: .episodeRunTime)
         genres = try container.decode([Genre].self, forKey: .genres)

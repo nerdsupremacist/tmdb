@@ -24,7 +24,7 @@ enum MovieOrTV: Decodable {
     case tv(TVShowResult)
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: MovieOrTV.CodingKeys.self)
         switch try container.decode(MediaType.self, forKey: .type) {
         case .movie:
             self = .movie(try MovieResult(from: decoder))
@@ -46,7 +46,7 @@ enum MovieOrTVOrPeople: Decodable {
     case person(PersonListResult)
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: MovieOrTVOrPeople.CodingKeys.self)
         switch try container.decode(MediaType.self, forKey: .type) {
         case .movie:
             self = .movie(try MovieResult(from: decoder))
