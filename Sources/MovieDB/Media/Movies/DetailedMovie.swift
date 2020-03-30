@@ -4,7 +4,7 @@ import GraphZahl
 import NIO
 
 class DetailedMovie: Movie {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case budget, genres, homepage
         case imdbID = "imdb_id"
         case productionCompanies = "production_companies"
@@ -25,7 +25,7 @@ class DetailedMovie: Movie {
     let status, tagline: String
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: DetailedMovie.CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         budget = try container.decode(Int.self, forKey: .budget)
         genres = try container.decode([Genre].self, forKey: .genres)
 //        homepage = try container.decode(URL?.self, forKey: .homepage)
@@ -51,7 +51,7 @@ class ProductionCompany: Codable {
     let logoPath: String?
     let name, originCountry: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case id
         case logoPath = "logo_path"
         case name
@@ -62,7 +62,7 @@ class ProductionCompany: Codable {
 class ProductionCountry: Codable, GraphQLObject {
     let iso3166_1, name: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case iso3166_1 = "iso_3166_1"
         case name
     }
@@ -71,7 +71,7 @@ class ProductionCountry: Codable, GraphQLObject {
 class SpokenLanguage: Codable, GraphQLObject {
     let iso639_1, name: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case iso639_1 = "iso_639_1"
         case name
     }

@@ -5,7 +5,7 @@ import NIO
 
 // MARK: - MovieBase
 class Movie: Decodable, GraphQLObject {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case poster = "poster_path"
         case isAdult = "adult"
         case overview

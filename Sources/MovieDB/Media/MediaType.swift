@@ -16,7 +16,7 @@ class MovieResult: Movie { }
 class TVShowResult: TVShow { }
 
 enum MovieOrTV: Decodable {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case type = "media_type"
     }
 
@@ -24,7 +24,7 @@ enum MovieOrTV: Decodable {
     case tv(TVShowResult)
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: MovieOrTV.CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try container.decode(MediaType.self, forKey: .type) {
         case .movie:
             self = .movie(try MovieResult(from: decoder))
@@ -37,7 +37,7 @@ enum MovieOrTV: Decodable {
 }
 
 enum MovieOrTVOrPeople: Decodable {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case type = "media_type"
     }
 
@@ -46,7 +46,7 @@ enum MovieOrTVOrPeople: Decodable {
     case person(PersonListResult)
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: MovieOrTVOrPeople.CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try container.decode(MediaType.self, forKey: .type) {
         case .movie:
             self = .movie(try MovieResult(from: decoder))

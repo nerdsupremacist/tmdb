@@ -5,7 +5,7 @@ import GraphZahl
 class AlternativeTitle: Decodable, GraphQLObject {
     let iso3166_1, title, type: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case iso3166_1 = "iso_3166_1"
         case title, type
     }

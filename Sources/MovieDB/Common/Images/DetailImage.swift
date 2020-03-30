@@ -14,7 +14,7 @@ class DetailImage<Size : GraphQLEnum>: Decodable, GraphQLObject {
     let voteAverage: Double
     let voteCount, width: Int
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case aspectRatio = "aspect_ratio"
         case image = "file_path"
         case height

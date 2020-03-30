@@ -112,7 +112,7 @@ struct Paging<Node: Decodable & OutputResolvable & ConcreteResolvable>: ContextB
 }
 
 struct Page<T: Decodable>: Decodable {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case results, page
         case totalResults = "total_results"
         case totalPages = "total_pages"

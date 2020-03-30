@@ -16,7 +16,7 @@ class TVShow: Decodable, GraphQLObject {
     let numberOfRatings: Int
     let name, originalName: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case poster = "poster_path"
         case popularityIndex = "popularity"
         case id

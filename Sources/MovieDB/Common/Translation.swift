@@ -11,7 +11,7 @@ class Translation<Info: Decodable & OutputResolvable & ConcreteResolvable>: Deco
     let localizedLanguage, language: String?
     let info: Info
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case iso3166_1 = "iso_3166_1"
         case iso639_1 = "iso_639_1"
         case localizedLanguage = "name"

@@ -8,7 +8,7 @@ class BasicPerson: Decodable, GraphQLObject {
     let id: Int
     let name: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case profilePicture = "profile_path"
         case id, name
     }

@@ -18,7 +18,7 @@ class DetailedTVShow: TVShow {
     let seasons: [Season]
     let status, type: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case createdBy = "created_by"
         case episodeRunTime = "episode_run_time"
         case genres, homepage
@@ -35,7 +35,7 @@ class DetailedTVShow: TVShow {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: DetailedTVShow.CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         createdBy = try container.decode([BaseCredit<BasicPerson>].self, forKey: .createdBy)
         episodeRunTime = try container.decode([Int].self, forKey: .episodeRunTime)
         genres = try container.decode([Genre].self, forKey: .genres)
@@ -65,7 +65,7 @@ class Episode: Decodable, GraphQLObject {
     let voteAverage: Double
     let voteCount: Int
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case airDate = "air_date"
         case episodeNumber = "episode_number"
         case id, name, overview
@@ -84,7 +84,7 @@ class Network: Decodable, GraphQLObject {
     let logo: Image<LogoSize>?
     let originCountry: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case name, id
         case logo = "logo_path"
         case originCountry = "origin_country"
@@ -99,7 +99,7 @@ class Season: Decodable, GraphQLObject {
     let poster: Image<PosterSize>?
     let seasonNumber: Int
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case airDate = "air_date"
         case episodeCount = "episode_count"
         case id, name, overview

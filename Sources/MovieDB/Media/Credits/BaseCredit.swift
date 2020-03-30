@@ -10,7 +10,7 @@ class BaseCredit<Value: Decodable & ConcreteResolvable & OutputResolvable>: Deco
     let id: String
     let value: Value
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case id = "credit_id"
     }
 

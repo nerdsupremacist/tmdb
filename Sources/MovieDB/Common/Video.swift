@@ -8,7 +8,7 @@ class Video: Decodable, GraphQLObject {
     let size: Int
     let type: String
 
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case id
         case iso639_1 = "iso_639_1"
         case iso3166_1 = "iso_3166_1"
