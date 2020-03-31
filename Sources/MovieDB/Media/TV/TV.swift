@@ -14,8 +14,8 @@ class TV: GraphQLObject {
         return client.get(at: "search", "tv", query: ["query" : term])
     }
 
-    func show(id: String) -> EventLoopFuture<DetailedTVShow> {
-        return client.get(at: "tv", .constant(id))
+    func show(id: Int) -> EventLoopFuture<DetailedTVShow> {
+        return client.get(at: "tv", .constant(String(id)))
     }
 
     func upcoming() -> EventLoopFuture<Paging<TVShow>> {

@@ -14,8 +14,8 @@ class Movies: GraphQLObject {
         return client.get(at: "search", "movie", query: ["query" : term])
     }
 
-    func movie(id: String) -> EventLoopFuture<DetailedMovie> {
-        return client.get(at: "movie", .constant(id))
+    func movie(id: Int) -> EventLoopFuture<DetailedMovie> {
+        return client.get(at: "movie", .constant(String(id)))
     }
 
     func upcoming() -> EventLoopFuture<Paging<Movie>> {

@@ -14,8 +14,8 @@ class People: GraphQLObject {
         return client.get(at: "search", "person", query: ["query" : term])
     }
 
-    func person(id: String) -> EventLoopFuture<DetailedPerson> {
-        return client.get(at: "person", .constant(id))
+    func person(id: Int) -> EventLoopFuture<DetailedPerson> {
+        return client.get(at: "person", .constant(String(id)))
     }
 
     func popular() -> EventLoopFuture<Paging<PersonListResult>> {
