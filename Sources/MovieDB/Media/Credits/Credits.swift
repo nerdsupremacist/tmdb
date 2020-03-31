@@ -4,7 +4,7 @@ import GraphZahl
 
 class Credits<Value: Decodable & ConcreteResolvable & OutputResolvable>: Decodable, GraphQLObject {
     static var concreteTypeName: String {
-        return "\(Value.concreteTypeName)Credits"
+        return String(describing: Self.self).replacingOccurrences(of: "<", with: "").replacingOccurrences(of: ">", with: "")
     }
 
     let id: Int

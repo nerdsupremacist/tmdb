@@ -1,6 +1,9 @@
 
 import Foundation
 import GraphZahl
+import GraphQL
+import NIO
+import ContextKit
 
 class DetailedTVShow: TVShow {
     let createdBy: [BaseCredit<BasicPerson>]
@@ -15,7 +18,7 @@ class DetailedTVShow: TVShow {
     let networks: [Network]
     let numberOfEpisodes, numberOfSeasons: Int
     let productionCompanies: [Network]
-    let seasons: [Season]
+    let seasons: [SeasonResult]
     let status, type: String
 
     private enum CodingKeys: String, CodingKey {
@@ -49,61 +52,9 @@ class DetailedTVShow: TVShow {
         numberOfEpisodes = try container.decode(Int.self, forKey: .numberOfEpisodes)
         numberOfSeasons = try container.decode(Int.self, forKey: .numberOfSeasons)
         productionCompanies = try container.decode([Network].self, forKey: .productionCompanies)
-        seasons = try container.decode([Season].self, forKey: .seasons)
+        seasons = try container.decode([SeasonResult].self, forKey: .seasons)
         status = try container.decode(String.self, forKey: .status)
         type = try container.decode(String.self, forKey: .type)
         try super.init(from: decoder)
-    }
-}
-
-class Episode: Decodable, GraphQLObject {
-    let airDate: String
-    let episodeNumber, id: Int
-    let name, overview, productionCode: String
-    let seasonNumber, showID: Int
-    let still: Image<StillSize>?
-    let voteAverage: Double
-    let voteCount: Int
-
-    private enum CodingKeys: String, CodingKey {
-        case airDate = "air_date"
-        case episodeNumber = "episode_number"
-        case id, name, overview
-        case productionCode = "production_code"
-        case seasonNumber = "season_number"
-        case showID = "show_id"
-        case still = "still_path"
-        case voteAverage = "vote_average"
-        case voteCount = "vote_count"
-    }
-}
-
-class Network: Decodable, GraphQLObject {
-    let name: String
-    let id: Int
-    let logo: Image<LogoSize>?
-    let originCountry: String
-
-    private enum CodingKeys: String, CodingKey {
-        case name, id
-        case logo = "logo_path"
-        case originCountry = "origin_country"
-    }
-}
-
-class Season: Decodable, GraphQLObject {
-    let airDate: Date?
-    let episodeCount, id: Int
-    let name: String
-    let overview: String?
-    let poster: Image<PosterSize>?
-    let seasonNumber: Int
-
-    private enum CodingKeys: String, CodingKey {
-        case airDate = "air_date"
-        case episodeCount = "episode_count"
-        case id, name, overview
-        case poster = "poster_path"
-        case seasonNumber = "season_number"
     }
 }

@@ -2,6 +2,8 @@
 import Foundation
 import GraphZahl
 import NIO
+import GraphQL
+import ContextKit
 
 class TVShow: Decodable, GraphQLObject {
     let poster: Image<PosterSize>?
@@ -33,6 +35,10 @@ class TVShow: Decodable, GraphQLObject {
 
     func details(client: Client) -> EventLoopFuture<DetailedTVShow> {
         return client.get(at: "tv", .constant(String(id)))
+    }
+
+    func season(client: Client, number: Int) -> EventLoopFuture<DetailedSeason> {
+        return client.get(at: "tv", .constant(String(id)), "season", .constant(String(number)))
     }
 
     func externalIds(client: Client) -> EventLoopFuture<ExternalIDS> {
@@ -73,5 +79,12 @@ class TVShow: Decodable, GraphQLObject {
 
     func similar(client: Client) -> EventLoopFuture<Paging<TVShow>> {
         return client.get(at: "tv", .constant(String(id)), "similar")
+    }
+
+    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<Any?> {
+        context.push {
+            .show ~> self
+        }
+        return eventLoop.future(self)
     }
 }
