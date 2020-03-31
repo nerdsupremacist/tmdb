@@ -13,6 +13,7 @@ class Client {
     let base: URL
     let imagesBase: URL
     let apiKey: String
+    let cache: Cache<URL, HTTPClient.Response>?
 
     var eventLoop: EventLoopGroup {
         return httpClient.eventLoopGroup
@@ -20,11 +21,12 @@ class Client {
 
     private let httpClient: HTTPClient
 
-    init(base: URL, imagesBase: URL, apiKey: String, httpClient: HTTPClient) {
+    init(base: URL, imagesBase: URL, apiKey: String, httpClient: HTTPClient, cache: Cache<URL, HTTPClient.Response>? = nil) {
         self.base = base
         self.imagesBase = imagesBase
         self.apiKey = apiKey
         self.httpClient = httpClient
+        self.cache = cache
     }
 
     deinit {
@@ -41,7 +43,19 @@ class Client {
         components.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) } + [URLQueryItem(name: "api_key", value: apiKey)]
 
         guard let url = components.url else { return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed)) }
-        return httpClient.get(url: url.absoluteString).decode(type: type)
+
+        if let cached = cache?[url] {
+            return eventLoop.tryFuture {
+                try cached.decode(type: type)
+            }
+        }
+        return httpClient
+            .get(url: url.absoluteString)
+            .always { [weak cache] result in
+                guard case .success(let response) = result else { return }
+                cache?[url] = response
+            }
+            .decode(type: type)
     }
 
     func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], type: T.Type = T.self) -> EventLoopFuture<T> {
@@ -57,6 +71,14 @@ class Client {
 
 extension EventLoopFuture where Value == HTTPClient.Response {
 
+    fileprivate func decode<T: Decodable>(type: T.Type = T.self) -> EventLoopFuture<T> {
+        return flatMapThrowing { try $0.decode(type: type) }
+    }
+
+}
+
+extension HTTPClient.Response {
+
     private static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         let dateFormatter = DateFormatter()
@@ -65,23 +87,21 @@ extension EventLoopFuture where Value == HTTPClient.Response {
         return decoder
     }()
 
-    func decode<T: Decodable>(type: T.Type = T.self) -> EventLoopFuture<T> {
-        return flatMapThrowing { response in
-            guard let buffer = response.body else {
-                throw Client.Error.emptyResponse
+    fileprivate func decode<T: Decodable>(type: T.Type = T.self) throws -> T {
+        guard let buffer = body else {
+            throw Client.Error.emptyResponse
+        }
+
+        let length = buffer.readableBytes
+        do {
+            guard let data = try buffer.getJSONDecodable(type, decoder: Self.decoder, at: 0, length: length) else {
+                throw Client.Error.failedDecoding
             }
 
-            let length = buffer.readableBytes
-            do {
-                guard let data = try buffer.getJSONDecodable(type, decoder: Self.decoder, at: 0, length: length) else {
-                    throw Client.Error.failedDecoding
-                }
-
-                return data
-            } catch {
-                print(error)
-                throw error
-            }
+            return data
+        } catch {
+            print(error)
+            throw error
         }
     }
 
