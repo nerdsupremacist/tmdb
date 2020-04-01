@@ -29,6 +29,10 @@ enum MovieDB : GraphQLSchema {
             return client.get(at: "trending", "all", .constant(timeWindow.rawValue))
         }
 
+        func find(externalId: String, source: ExternalSource) -> EventLoopFuture<FromExternalIds> {
+            return client.get(at: "find", .constant(externalId), query: ["external_source" : source.rawValue + "_id"])
+        }
+
         required init(viewerContext client: Client) {
             self.client = client
         }
