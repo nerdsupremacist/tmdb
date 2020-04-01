@@ -32,4 +32,8 @@ class BasicPerson: Decodable, GraphQLObject {
     func translations(client: Client) -> EventLoopFuture<[Translation<TranslatedPersonInfo>]> {
         return client.get(at: "person", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
     }
+
+    func taggedImages(client: Client) -> EventLoopFuture<Paging<TaggedImage>> {
+        return client.get(at: "person", .constant(String(id)), "tagged_images")
+    }
 }
