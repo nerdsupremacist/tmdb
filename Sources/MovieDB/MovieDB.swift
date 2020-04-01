@@ -25,6 +25,10 @@ enum MovieDB : GraphQLSchema {
             return client.get(at: "search", "multi", query: ["query" : term])
         }
 
+        func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<Paging<MovieOrTVOrPeople>> {
+            return client.get(at: "trending", "all", .constant(timeWindow.rawValue))
+        }
+
         required init(viewerContext client: Client) {
             self.client = client
         }

@@ -14,6 +14,11 @@ class TV: GraphQLObject {
         return client.get(at: "search", "tv", query: ["query" : term])
     }
 
+    func trending(timeWindow: TimeWindow?) -> EventLoopFuture<Paging<TVShow>> {
+        let timeWindow = timeWindow ?? .day
+        return client.get(at: "trending", "tv", .constant(timeWindow.rawValue))
+    }
+
     func show(id: Int) -> EventLoopFuture<DetailedTVShow> {
         return client.get(at: "tv", .constant(String(id)))
     }

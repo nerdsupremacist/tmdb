@@ -14,6 +14,11 @@ class People: GraphQLObject {
         return client.get(at: "search", "person", query: ["query" : term])
     }
 
+    func trending(timeWindow: TimeWindow?) -> EventLoopFuture<Paging<PersonListResult>> {
+        let timeWindow = timeWindow ?? .day
+        return client.get(at: "trending", "person", .constant(timeWindow.rawValue))
+    }
+
     func person(id: Int) -> EventLoopFuture<DetailedPerson> {
         return client.get(at: "person", .constant(String(id)))
     }
