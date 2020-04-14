@@ -2,7 +2,7 @@
 import Foundation
 import GraphZahl
 
-enum TimeWindow: String, GraphQLEnum {
+enum TimeWindow: String, CaseIterable, GraphQLEnum {
     case day
     case week
 }

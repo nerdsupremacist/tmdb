@@ -5,23 +5,23 @@ import GraphZahl
 import ContextKit
 import NIO
 
-enum BackdropSize: String, GraphQLEnum {
+enum BackdropSize: String, CaseIterable, GraphQLEnum {
     case w300, w780, w1280, original
 }
 
-enum PosterSize: String, GraphQLEnum {
+enum PosterSize: String, CaseIterable, GraphQLEnum {
     case w92, w154, w185, w342, w500, w780, original
 }
 
-enum ProfileSize: String, GraphQLEnum {
+enum ProfileSize: String, CaseIterable, GraphQLEnum {
     case w45, w185, h632, original
 }
 
-enum StillSize: String, GraphQLEnum {
+enum StillSize: String, CaseIterable, GraphQLEnum {
     case w92, w185, w300, original
 }
 
-enum LogoSize: String, GraphQLEnum {
+enum LogoSize: String, CaseIterable, GraphQLEnum {
     case w45, w92, w154, w185, w300, w500, original
 }
 
@@ -56,7 +56,7 @@ extension Image: OutputResolvable where Size: InputResolvable & ConcreteResolvab
     }
 
     func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> EventLoopFuture<Any?> {
-        let url = self.url(size: try Size(map: arguments["size"]!), client: context.anyViewerContext as! Client)
+        let url = self.url(size: try Size.create(from: arguments["size"]!), client: context.anyViewerContext as! Client)
         return url.resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
     }
 }

@@ -2,7 +2,7 @@
 import Foundation
 import GraphZahl
 
-class DetailImage<Size : GraphQLEnum>: Decodable, GraphQLObject {
+class DetailImage<Size : GraphQLEnum & RawRepresentable>: Decodable, GraphQLObject where Size.RawValue == String {
     static var concreteTypeName: String {
         return "\(Size.concreteTypeName)DetailImage"
     }

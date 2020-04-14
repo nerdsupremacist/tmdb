@@ -2,7 +2,7 @@
 import Foundation
 import GraphZahl
 
-enum Gender: String, GraphQLEnum, Decodable {
+enum Gender: String, CaseIterable, GraphQLEnum, Decodable {
     case unknownOrNonBinary
     case female
     case male

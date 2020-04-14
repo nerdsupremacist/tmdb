@@ -2,7 +2,7 @@
 import Foundation
 import GraphZahl
 
-enum AnyImage: Decodable {
+enum AnyImage: Decodable, GraphQLUnion {
     private enum CodingKeys: String, CodingKey {
         case imageType = "image_type"
     }
@@ -26,25 +26,6 @@ enum AnyImage: Decodable {
             self = .still(try DetailImage<StillSize>(from: decoder))
         case .logo:
             self = .logo(try DetailImage<LogoSize>(from: decoder))
-        }
-    }
-}
-
-extension AnyImage: DelegatedOutputResolvable {
-    typealias Resolvable = Union5<DetailImage<BackdropSize>, DetailImage<PosterSize>, DetailImage<ProfileSize>, DetailImage<StillSize>, DetailImage<LogoSize>>
-
-    func resolve() throws -> Resolvable {
-        switch self {
-        case .backdrop(let image):
-            return .a(image)
-        case .poster(let image):
-            return .b(image)
-        case .profile(let image):
-            return .c(image)
-        case .still(let image):
-            return .d(image)
-        case .logo(let image):
-            return .e(image)
         }
     }
 }

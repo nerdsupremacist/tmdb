@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/swift-server/async-http-client.git",
         "state": {
           "branch": null,
-          "revision": "e2636a4c24e646d3e480fc666da0c090818beb09",
-          "version": "1.1.0"
+          "revision": "037b70291941fe43de668066eb6fb802c5e181d2",
+          "version": "1.1.1"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/vapor/async-kit.git",
         "state": {
           "branch": null,
-          "revision": "1f145cffe2109d0fc420bc03b31dacf9de2c7573",
-          "version": "1.0.0"
+          "revision": "48a719dec79ea3cbbc71ca9b29f69df7cd5794cd",
+          "version": "1.0.1"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/console-kit.git",
         "state": {
           "branch": null,
-          "revision": "f674ff0d037346ad5f9a4feb5088b769cdb9e5d3",
-          "version": "4.0.0"
+          "revision": "7a97a5ea7fefe61cf2c943242113125b0f396a98",
+          "version": "4.1.0"
         }
       },
       {
@@ -60,17 +60,17 @@
         "repositoryURL": "https://github.com/nerdsupremacist/GraphQL.git",
         "state": {
           "branch": null,
-          "revision": "2bb4e710f0de96a515f10812780b790c531ec6e5",
-          "version": "0.12.1-beta.3"
+          "revision": "2bbd17e9c0c8319d0539c6f5b377b1348c8327b2",
+          "version": "0.12.1-beta.4"
         }
       },
       {
         "package": "GraphZahl",
         "repositoryURL": "https://github.com/nerdsupremacist/GraphZahl.git",
         "state": {
-          "branch": null,
-          "revision": "a65dc36daebaa0784a3b1c728e4b993ccae7b3d8",
-          "version": "0.1.0-alpha.13"
+          "branch": "master",
+          "revision": "8b0840ea6eef26ca474c2a787955d235e81f388b",
+          "version": null
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/nerdsupremacist/graphzahl-vapor-support.git",
         "state": {
           "branch": null,
-          "revision": "11165592b707c54340b23f4dccf1bad33a74f8bc",
-          "version": "0.1.0-alpha.3"
+          "revision": "1a81d9cd3c540bad43d257828d0887f05587b232",
+          "version": "0.1.0-alpha.4"
         }
       },
       {
@@ -95,9 +95,9 @@
         "package": "Runtime",
         "repositoryURL": "https://github.com/nerdsupremacist/Runtime.git",
         "state": {
-          "branch": null,
-          "revision": "dcc597b71ea4683027a35e527b4f3882437fccaa",
-          "version": "2.1.2-beta.6"
+          "branch": "master",
+          "revision": "1171b44a800289e896a19ef46e9c0475047daf67",
+          "version": null
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "a27a07719ca785bcaca019a5b9fe1814b981b4a2",
-          "version": "2.15.0"
+          "revision": "e876fb37410e0036b98b5361bb18e6854739572b",
+          "version": "2.16.0"
         }
       },
       {
@@ -177,8 +177,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "cac009e6699b27b38335f69f9ce93d6b6c81f79f",
-          "version": "4.0.0-rc.3.11"
+          "revision": "089361cf633080028c2f15d58e0fd6e48c64f323",
+          "version": "4.0.1"
         }
       },
       {
@@ -186,8 +186,8 @@
         "repositoryURL": "https://github.com/vapor/websocket-kit.git",
         "state": {
           "branch": null,
-          "revision": "aac462481bcd3039d5db9a0fbe7f4e47eefe2295",
-          "version": "2.0.0-rc.1"
+          "revision": "f46778e3f1452cc80a0a6c422cdc52a5d0258795",
+          "version": "2.0.0"
         }
       }
     ]

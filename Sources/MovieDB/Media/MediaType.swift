@@ -15,7 +15,7 @@ class MovieResult: Movie { }
 
 class TVShowResult: TVShow { }
 
-enum MovieOrTV: Decodable {
+enum MovieOrTV: Decodable, GraphQLUnion {
     private enum CodingKeys: String, CodingKey {
         case type = "media_type"
     }
@@ -36,7 +36,7 @@ enum MovieOrTV: Decodable {
     }
 }
 
-enum MovieOrTVOrPeople: Decodable {
+enum MovieOrTVOrPeople: Decodable, GraphQLUnion {
     private enum CodingKeys: String, CodingKey {
         case type = "media_type"
     }
@@ -56,61 +56,4 @@ enum MovieOrTVOrPeople: Decodable {
             self = .person(try PersonListResult(from: decoder))
         }
     }
-}
-
-extension MovieOrTV: DelegatedOutputResolvable {
-
-    func resolve() throws -> Union2<MovieResult, TVShowResult> {
-        switch self {
-        case .movie(let movie):
-            return .a(movie)
-        case .tv(let show):
-            return .b(show)
-        }
-    }
-
-}
-
-extension MovieOrTVOrPeople: DelegatedOutputResolvable {
-
-    func resolve() throws -> Union3<MovieResult, TVShowResult, PersonListResult> {
-        switch self {
-        case .movie(let movie):
-            return .a(movie)
-        case .tv(let show):
-            return .b(show)
-        case .person(let person):
-            return .c(person)
-        }
-    }
-
-}
-
-protocol DelegatedOutputResolvable: OutputResolvable, ConcreteResolvable {
-    associatedtype Resolvable: OutputResolvable & ConcreteResolvable
-    func resolve() throws -> Resolvable
-}
-
-extension DelegatedOutputResolvable {
-
-    static var additionalArguments: [String : InputResolvable.Type] {
-        return Resolvable.additionalArguments
-    }
-
-    static var concreteTypeName: String {
-        return Resolvable.concreteTypeName
-    }
-
-    static func reference(using context: inout Resolution.Context) throws -> GraphQLOutputType {
-        return try context.reference(for: Resolvable.self)
-    }
-
-    static func resolve(using context: inout Resolution.Context) throws -> GraphQLOutputType {
-        return try context.resolve(type: Resolvable.self)
-    }
-
-    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> EventLoopFuture<Any?> {
-        return try resolve().resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
-    }
-
 }
