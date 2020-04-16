@@ -59,9 +59,9 @@
         "package": "GraphQL",
         "repositoryURL": "https://github.com/nerdsupremacist/GraphQL.git",
         "state": {
-          "branch": "master",
+          "branch": null,
           "revision": "253b6efa4fdac99a0feef631023232729864a7c1",
-          "version": null
+          "version": "0.12.1-beta.6"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/nerdsupremacist/GraphZahl.git",
         "state": {
           "branch": null,
-          "revision": "e9b21893e33b3ca2ed1f3c5f5c5edfaf017b9683",
-          "version": "0.1.0-alpha.20"
+          "revision": "b80d9f46132e25094807e90200db2200184c0cbf",
+          "version": "0.1.0-alpha.21"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/nerdsupremacist/graphzahl-vapor-support.git",
         "state": {
           "branch": null,
-          "revision": "1a81d9cd3c540bad43d257828d0887f05587b232",
-          "version": "0.1.0-alpha.4"
+          "revision": "52fc132c21b4c672a7b7f54b4f94e1cf2f867277",
+          "version": "0.1.0-alpha.5"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/routing-kit.git",
         "state": {
           "branch": null,
-          "revision": "35da702471cbcc308f58d38aa8fea971fa3fb166",
-          "version": "4.0.0"
+          "revision": "ee590c42d0b74fb6644c5ec128a2edc86c2858ff",
+          "version": "4.0.1"
         }
       },
       {
@@ -177,8 +177,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "d00c85ded785b7c9a68045a4d2a4676625afeb97",
-          "version": "4.1.0"
+          "revision": "0aad60e61dffcd3f2131953f138235584a01c6f5",
+          "version": "4.2.1"
         }
       },
       {

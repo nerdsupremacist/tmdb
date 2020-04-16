@@ -12,9 +12,8 @@ let package = Package(
             targets: ["MovieDB"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nerdsupremacist/GraphZahl.git", from: "0.1.0-alpha.20"),
-        .package(url: "https://github.com/nerdsupremacist/GraphQL.git", .branch("master")),
-        .package(url: "https://github.com/nerdsupremacist/graphzahl-vapor-support.git", from: "0.1.0-alpha.3"),
+        .package(url: "https://github.com/nerdsupremacist/GraphZahl.git", from: "0.1.0-alpha.21"),
+        .package(url: "https://github.com/nerdsupremacist/graphzahl-vapor-support.git", from: "0.1.0-alpha.5"),
     ],
     targets: [
         .target(
