@@ -17,7 +17,7 @@ guard let apiKey = ProcessInfo.processInfo.environment["API_KEY"] else {
     fatalError("Did not provide an API Key")
 }
 
-app.routes.graphql(use: MovieDB.self, eventLoopGroup: eventLoopGroup, includeGraphiQL: true) { request -> Client in
+app.routes.graphql(use: MovieDB.self, eventLoopGroup: nil, includeGraphiQL: true) { request -> Client in
     let httpClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
     return Client(base: base,
                   imagesBase: imagesBase,
