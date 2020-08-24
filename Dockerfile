@@ -1,4 +1,4 @@
-FROM swift
+FROM swift:5.2.5
 WORKDIR /app
 ADD . ./
 

@@ -48,11 +48,11 @@
       },
       {
         "package": "CwlDemangle",
-        "repositoryURL": "https://github.com/mattgallagher/CwlDemangle.git",
+        "repositoryURL": "https://github.com/nerdsupremacist/CwlDemangle.git",
         "state": {
           "branch": null,
-          "revision": "b268c08207d2990664605c49b2c71cbd0df3445b",
-          "version": "0.1.0"
+          "revision": "ca1ffdc206f76dc5f217f27ea2a0bbd2241a4a92",
+          "version": "0.1.1-beta.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/nerdsupremacist/GraphZahl.git",
         "state": {
           "branch": null,
-          "revision": "c0da9b0c5d6aa416adca4af09cddb759cc970b8a",
-          "version": "0.1.0-alpha.29"
+          "revision": "9bd0dc1ba2ae4770790558fb39cc3e801846d5cc",
+          "version": "0.1.0-alpha.35"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/nerdsupremacist/Runtime.git",
         "state": {
           "branch": null,
-          "revision": "3c87a4e966baff36c8d0bc35620f833a55c6f201",
-          "version": "2.1.2-beta.10"
+          "revision": "0fa308e65890216eeb1bb2c4b7bb87dd175b17f8",
+          "version": "2.1.2-beta.12"
         }
       },
       {
