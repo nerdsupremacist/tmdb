@@ -33,7 +33,7 @@ class DetailedPerson: Person {
         alsoKnownAs = try container.decode([String].self, forKey: .alsoKnownAs)
         gender = try container.decode(Gender.self, forKey: .gender)
         biography = try container.decode(String.self, forKey: .biography)
-        placeOfBirth = try container.decode(String?.self, forKey: .biography)
+        placeOfBirth = try container.decode(String?.self, forKey: .placeOfBirth)
         imdbID = try container.decode(String?.self, forKey: .imdbID)
         homepage = try container.decode(URL?.self, forKey: .homepage)
         try super.init(from: decoder)
