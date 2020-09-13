@@ -3,12 +3,14 @@ import Foundation
 import GraphZahl
 import NIO
 import Vapor
+import Cache
 import GraphZahlVaporSupport
 
 let app = Application(try .detect())
 
 let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 10)
-let cache = Cache<URL, HTTPClient.Response>()
+let cacheConfig = MemoryConfig(expiry: .never, countLimit: 500, totalCostLimit: 100_000)
+let cache = MemoryStorage<URL, HTTPClient.Response>(config: cacheConfig)
 
 let base = URL(string: "https://api.themoviedb.org/3/")!
 let imagesBase = URL(string: "https://image.tmdb.org/t/p/")!

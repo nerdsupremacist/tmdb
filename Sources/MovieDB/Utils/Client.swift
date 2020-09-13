@@ -2,6 +2,7 @@
 import Foundation
 import Vapor
 import NIO
+import Cache
 
 class Client {
     enum Error: Swift.Error {
@@ -13,7 +14,7 @@ class Client {
     let base: URL
     let imagesBase: URL
     let apiKey: String
-    let cache: Cache<URL, HTTPClient.Response>?
+    let cache: MemoryStorage<URL, HTTPClient.Response>?
 
     var eventLoop: EventLoopGroup {
         return httpClient.eventLoopGroup
@@ -21,7 +22,7 @@ class Client {
 
     private let httpClient: HTTPClient
 
-    init(base: URL, imagesBase: URL, apiKey: String, httpClient: HTTPClient, cache: Cache<URL, HTTPClient.Response>? = nil) {
+    init(base: URL, imagesBase: URL, apiKey: String, httpClient: HTTPClient, cache: MemoryStorage<URL, HTTPClient.Response>? = nil) {
         self.base = base
         self.imagesBase = imagesBase
         self.apiKey = apiKey
@@ -30,10 +31,14 @@ class Client {
     }
 
     deinit {
-        try! httpClient.syncShutdown()
+        httpClient.shutdown { [httpClient] error in
+            _ = httpClient
+            guard let error = error else { return }
+            print("Error shutting down client \(error)")
+        }
     }
 
-    func get<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], type: T.Type = T.self) -> EventLoopFuture<T> {
+    func get<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60), type: T.Type = T.self) -> EventLoopFuture<T> {
         let composed = path.reduce(base) { $0.appendingPathComponent($1.description) }
 
         guard var components = URLComponents(url: composed, resolvingAgainstBaseURL: true) else {
@@ -44,7 +49,7 @@ class Client {
 
         guard let url = components.url else { return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed)) }
 
-        if let cached = cache?[url] {
+        if let cached = try? cache?.object(forKey: url) {
             return eventLoop.tryFuture {
                 try cached.decode(type: type)
             }
@@ -53,17 +58,17 @@ class Client {
             .get(url: url.absoluteString)
             .always { [weak cache] result in
                 guard case .success(let response) = result else { return }
-                cache?[url] = response
+                cache?.setObject(response, forKey: url, expiry: expiry)
             }
             .decode(type: type)
     }
 
-    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], type: T.Type = T.self) -> EventLoopFuture<T> {
-        return get(at: path, query: query, type: type)
+    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60), type: T.Type = T.self) -> EventLoopFuture<T> {
+        return get(at: path, query: query, expiry: expiry, type: type)
     }
 
-    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:]) -> EventLoopFuture<Paging<T>> {
-        return get(at: path, query: query, type: Page<T>.self).map { page in
+    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60)) -> EventLoopFuture<Paging<T>> {
+        return get(at: path, query: query, expiry: expiry, type: Page<T>.self).map { page in
             return Paging(client: self, first: page, path: path, query: query)
         }
     }

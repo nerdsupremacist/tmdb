@@ -55,8 +55,8 @@ extension Image: OutputResolvable where Size: InputResolvable & ConcreteResolvab
         return try context.resolve(type: URL.self)
     }
 
-    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> EventLoopFuture<Any?> {
+    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> Output {
         let url = self.url(size: try Size.create(from: arguments["size"]!), client: context.anyViewerContext as! Client)
-        return url.resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
+        return try url.resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
     }
 }
