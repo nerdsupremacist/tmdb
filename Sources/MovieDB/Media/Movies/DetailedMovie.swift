@@ -14,6 +14,15 @@ class DetailedMovie: Movie {
         case status, tagline
     }
 
+    enum Status: String, Decodable, CaseIterable, GraphQLEnum {
+        case rumored = "Rumored"
+        case planned = "Planned"
+        case inProduction = "In Production"
+        case postProduction = "Post Production"
+        case released = "Released"
+        case cancelled = "Cancelled"
+    }
+
     let budget: Int
     let genres: [Genre]
 //    let homepage: URL?
@@ -22,7 +31,8 @@ class DetailedMovie: Movie {
     let productionCountries: [ProductionCountry]
     let revenue, runtime: Int
     let spokenLanguages: [SpokenLanguage]
-    let status, tagline: String
+    let status: Status
+    let tagline: String
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -35,7 +45,7 @@ class DetailedMovie: Movie {
         revenue = try container.decode(Int.self, forKey: .revenue)
         runtime = try container.decode(Int.self, forKey: .runtime)
         spokenLanguages = try container.decode([SpokenLanguage].self, forKey: .spokenLanguages)
-        status = try container.decode(String.self, forKey: .status)
+        status = try container.decode(Status.self, forKey: .status)
         tagline = try container.decode(String.self, forKey: .tagline)
         try super.init(from: decoder)
     }
@@ -46,14 +56,14 @@ class Genre: Codable, GraphQLObject {
     let name: String
 }
 
-class ProductionCompany: Codable {
+class ProductionCompany: Decodable, GraphQLObject {
     let id: Int
-    let logoPath: String?
+    let logo: Image<LogoSize>?
     let name, originCountry: String
 
     private enum CodingKeys: String, CodingKey {
         case id
-        case logoPath = "logo_path"
+        case logo = "logo_path"
         case name
         case originCountry = "origin_country"
     }
