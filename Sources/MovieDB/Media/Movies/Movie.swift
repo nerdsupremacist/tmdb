@@ -37,7 +37,7 @@ class Movie: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "movie", .constant(String(id)))
     }
 
-    func streamingOptions(types: [StreamingMonetizationType] = [.flatrate, .free], viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
+    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
         return viewerContext.streamingOptions(id: id, name: title, contentType: .movie)
     }
 
