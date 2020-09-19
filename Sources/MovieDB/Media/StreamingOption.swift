@@ -175,21 +175,26 @@ extension StreamingMonetizationType {
 }
 
 enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
+    case dvd
+    case bluray
     case sd
     case hd
     case ultraHD
 
     init(from decoder: Decoder) throws {
-        switch try String(from: decoder) {
-        case "hd":
-            self = .hd
-        case "sd":
-            self = .sd
+        let rawValue = try String(from: decoder)
+        switch rawValue {
         case "4k":
             self = .ultraHD
         default:
+            break
+        }
+
+        guard let resolution = VideoResolution(rawValue: rawValue) else {
             throw DecodingError.typeMismatch(VideoResolution.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Value is not supported by VideoResolution"))
         }
+
+        self = resolution
     }
 }
 
@@ -203,6 +208,10 @@ extension VideoResolution {
             return 1
         case .sd:
             return 2
+        case .bluray:
+            return 3
+        case .dvd:
+            return 4
         }
     }
 
