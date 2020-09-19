@@ -186,6 +186,7 @@ enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
         switch rawValue {
         case "4k":
             self = .ultraHD
+            return
         default:
             break
         }
