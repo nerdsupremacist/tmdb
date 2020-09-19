@@ -22,7 +22,7 @@ extension MovieDB.ViewerContext {
             }
             .map { response in
                 guard let response = response else { return nil }
-                let item = response.items.first { $0.scoring.contains { $0.providerType == "tmdb:id" && $0.value == Double(id) } } ?? response.items.first { $0.title == name }
+                let item = response.items.first { $0.scoring?.contains { $0.providerType == "tmdb:id" && $0.value == Double(id) } ?? false } ?? response.items.first { $0.title == name }
                 guard let offers = item?.offers else { return nil }
                 let groupped = Dictionary(grouping: offers, by: { $0.providerID })
                 return groupped
@@ -53,7 +53,7 @@ private struct JustWatchResponse: Decodable {
 private struct JustWatchItem: Decodable {
     let title: String
     let offers: [DecodedStreamingOption]?
-    let scoring: [Scoring]
+    let scoring: [Scoring]?
 }
 
 class Scoring: Decodable {
