@@ -11,15 +11,15 @@ class PersonCredits: GraphQLObject {
         self.id = id
     }
 
-    func all(client: Client) -> EventLoopFuture<Credits<MovieOrTV>> {
-        return client.get(at: "person", .constant(String(id)), "combined_credits")
+    func all(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Credits<MovieOrTV>> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "combined_credits")
     }
 
-    func movies(client: Client) -> EventLoopFuture<Credits<Movie>> {
-        return client.get(at: "person", .constant(String(id)), "movie_credits")
+    func movies(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Credits<Movie>> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "movie_credits")
     }
 
-    func tv(client: Client) -> EventLoopFuture<Credits<TVShow>> {
-        return client.get(at: "person", .constant(String(id)), "tv_credits")
+    func tv(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Credits<TVShow>> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "tv_credits")
     }
 }

@@ -33,47 +33,51 @@ class Movie: Decodable, GraphQLObject {
     let isVideo: Bool
     let rating: Double
 
-    func details(client: Client) -> EventLoopFuture<DetailedMovie> {
-        return client.get(at: "movie", .constant(String(id)))
-    }
-    
-    func externalIds(client: Client) -> EventLoopFuture<ExternalIDS> {
-        return client.get(at: "movie", .constant(String(id)), "external_ids")
+    func details(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<DetailedMovie> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)))
     }
 
-    func alternativeTitles(client: Client) -> EventLoopFuture<[AlternativeTitle]> {
-        return client.get(at: "movie", .constant(String(id)), "alternative_titles").map { (wrapper: AlternativeTitles) in wrapper.titles }
+    func streamingOptions(types: [StreamingMonetizationType] = [.flatrate, .free], viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
+        return viewerContext.streamingOptions(id: id, name: title, contentType: .movie)
     }
 
-    func translations(client: Client) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
-        return client.get(at: "movie", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
+    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "external_ids")
     }
 
-    func images(client: Client) -> EventLoopFuture<MediaImages> {
-        return client.get(at: "movie", .constant(String(id)), "images")
+    func alternativeTitles(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[AlternativeTitle]> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "alternative_titles").map { (wrapper: AlternativeTitles) in wrapper.titles }
     }
 
-    func keywords(client: Client) -> EventLoopFuture<[Keyword]> {
-        return client.get(at: "movie", .constant(String(id)), "keywords").map { (wrapper: Keywords) in wrapper.keywords }
+    func translations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
     }
 
-    func videos(client: Client) -> EventLoopFuture<[Video]> {
-        return client.get(at: "movie", .constant(String(id)), "videos").map { (wrapper: Videos) in wrapper.results }
+    func images(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<MediaImages> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "images")
     }
 
-    func reviews(client: Client) -> EventLoopFuture<Paging<Review>> {
-        return client.get(at: "movie", .constant(String(id)), "reviews")
+    func keywords(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Keyword]> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "keywords").map { (wrapper: Keywords) in wrapper.keywords }
     }
 
-    func credits(client: Client) -> EventLoopFuture<Credits<BasicPerson>> {
-        return client.get(at: "movie", .constant(String(id)), "credits")
+    func videos(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Video]> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "videos").map { (wrapper: Videos) in wrapper.results }
     }
 
-    func recommendations(client: Client) -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", .constant(String(id)), "recommendations")
+    func reviews(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<Review>> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "reviews")
     }
 
-    func similar(client: Client) -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", .constant(String(id)), "similar")
+    func credits(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Credits<BasicPerson>> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "credits")
+    }
+
+    func recommendations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<Movie>> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "recommendations")
+    }
+
+    func similar(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<Movie>> {
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "similar")
     }
 }

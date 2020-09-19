@@ -4,6 +4,10 @@ import Vapor
 import NIO
 import Cache
 
+protocol Authenticator {
+    func authenticate(with queryParamters: inout [URLQueryItem])
+}
+
 class Client {
     enum Error: Swift.Error {
         case emptyResponse
@@ -11,10 +15,15 @@ class Client {
         case invalidURL(URL)
     }
 
+    struct CacheEntry: Hashable {
+        let method: HTTPMethod
+        let url: URL
+        let body: JSON?
+    }
+
     let base: URL
-    let imagesBase: URL
-    let apiKey: String
-    let cache: MemoryStorage<URL, HTTPClient.Response>?
+    let authenticator: Authenticator?
+    let cache: MemoryStorage<CacheEntry, HTTPClient.Response>?
 
     var eventLoop: EventLoopGroup {
         return httpClient.eventLoopGroup
@@ -22,10 +31,9 @@ class Client {
 
     private let httpClient: HTTPClient
 
-    init(base: URL, imagesBase: URL, apiKey: String, httpClient: HTTPClient, cache: MemoryStorage<URL, HTTPClient.Response>? = nil) {
+    init(base: URL, authenticator: Authenticator? = nil, httpClient: HTTPClient, cache: MemoryStorage<CacheEntry, HTTPClient.Response>? = nil) {
         self.base = base
-        self.imagesBase = imagesBase
-        self.apiKey = apiKey
+        self.authenticator = authenticator
         self.httpClient = httpClient
         self.cache = cache
     }
@@ -38,39 +46,73 @@ class Client {
         }
     }
 
-    func get<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60), type: T.Type = T.self) -> EventLoopFuture<T> {
+    private func request<T: Decodable>(_ method: HTTPMethod,
+                                       at path: [PathComponent],
+                                       query: [String : String] = [:],
+                                       body: JSON? = nil,
+                                       expiry: Expiry = .minutes(30),
+                                       type: T.Type = T.self) -> EventLoopFuture<T> {
+
         let composed = path.reduce(base) { $0.appendingPathComponent($1.description) }
 
         guard var components = URLComponents(url: composed, resolvingAgainstBaseURL: true) else {
             return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed))
         }
 
-        components.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) } + [URLQueryItem(name: "api_key", value: apiKey)]
+        var items = query.map { URLQueryItem(name: $0.key, value: $0.value) }
+        authenticator?.authenticate(with: &items)
+        components.queryItems = !items.isEmpty ? items : nil
 
         guard let url = components.url else { return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed)) }
+        let entry = CacheEntry(method: method, url: url, body: body)
 
-        if let cached = try? cache?.object(forKey: url) {
+        if let cached = try? cache?.object(forKey: entry) {
             return eventLoop.tryFuture {
                 try cached.decode(type: type)
             }
         }
-        return httpClient
-            .get(url: url.absoluteString)
-            .always { [weak cache] result in
-                guard case .success(let response) = result else { return }
-                cache?.setObject(response, forKey: url, expiry: expiry)
+
+        return httpClient.eventLoopGroup.tryFuture {
+            let body = try body.map { body -> HTTPClient.Body in
+                let data = try JSONEncoder().encode(body)
+                return HTTPClient.Body.data(data)
             }
-            .decode(type: type)
+
+            var request = try HTTPClient.Request(url: url, method: method, body: body)
+            if body != nil {
+                request.headers.add(name: .contentType, value: "application/json")
+            }
+
+            return httpClient.execute(request: request)
+                .always { [weak cache] result in
+                    guard case .success(let response) = result else { return }
+                    cache?.setObject(response, forKey: entry, expiry: expiry)
+                }
+                .decode(type: type)
+        }
+        .flatMap { $0 }
     }
 
-    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60), type: T.Type = T.self) -> EventLoopFuture<T> {
+    func get<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], expiry: Expiry = .minutes(30), type: T.Type = T.self) -> EventLoopFuture<T> {
+        return request(.GET, at: path, query: query, body: nil, expiry: expiry, type: type)
+    }
+
+    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .minutes(30), type: T.Type = T.self) -> EventLoopFuture<T> {
         return get(at: path, query: query, expiry: expiry, type: type)
     }
 
-    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .seconds(30 * 60)) -> EventLoopFuture<Paging<T>> {
+    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .minutes(30)) -> EventLoopFuture<Paging<T>> {
         return get(at: path, query: query, expiry: expiry, type: Page<T>.self).map { page in
             return Paging(client: self, first: page, path: path, query: query)
         }
+    }
+
+    func post<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], body: JSON?, expiry: Expiry = .minutes(30), type: T.Type = T.self) -> EventLoopFuture<T> {
+        return request(.POST, at: path, query: query, body: body, expiry: expiry, type: type)
+    }
+
+    func post<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], body: JSON?, expiry: Expiry = .minutes(30), type: T.Type = T.self) -> EventLoopFuture<T> {
+        return post(at: path, query: query, body: body, expiry: expiry, type: type)
     }
 }
 
@@ -111,3 +153,5 @@ extension HTTPClient.Response {
     }
 
 }
+
+extension HTTPMethod: Hashable { }

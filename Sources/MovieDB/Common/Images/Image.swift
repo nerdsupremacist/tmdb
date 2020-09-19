@@ -32,8 +32,8 @@ class Image<Size : RawRepresentable>: Decodable where Size.RawValue == String {
         path = try String(from: decoder)
     }
 
-    func url(size: Size, client: Client) -> URL {
-        return client.imagesBase.appendingPathComponent(size.rawValue).appendingPathComponent(path)
+    func url(size: Size, viewerContext: MovieDB.ViewerContext) -> URL {
+        return viewerContext.tmdbImageBase.appendingPathComponent(size.rawValue).appendingPathComponent(path)
     }
 }
 
@@ -56,7 +56,7 @@ extension Image: OutputResolvable where Size: InputResolvable & ConcreteResolvab
     }
 
     func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> Output {
-        let url = self.url(size: try Size.create(from: arguments["size"]!), client: context.anyViewerContext as! Client)
+        let url = self.url(size: try Size.create(from: arguments["size"]!), viewerContext: context.anyViewerContext as! MovieDB.ViewerContext)
         return try url.resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
     }
 }

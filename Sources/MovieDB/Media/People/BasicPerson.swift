@@ -17,23 +17,23 @@ class BasicPerson: Decodable, GraphQLObject {
         return PersonCredits(id: id)
     }
 
-    func details(client: Client) -> EventLoopFuture<DetailedPerson> {
-        return client.get(at: "person", .constant(String(id)))
+    func details(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<DetailedPerson> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)))
     }
 
-    func images(client: Client) -> EventLoopFuture<[DetailImage<ProfileSize>]> {
-        return client.get(at: "person", .constant(String(id)), "images").map { (wrapper: PersonImages) in wrapper.profiles }
+    func images(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[DetailImage<ProfileSize>]> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "images").map { (wrapper: PersonImages) in wrapper.profiles }
     }
 
-    func externalIds(client: Client) -> EventLoopFuture<ExternalIDS> {
-        return client.get(at: "person", .constant(String(id)), "external_ids")
+    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "external_ids")
     }
 
-    func translations(client: Client) -> EventLoopFuture<[Translation<TranslatedPersonInfo>]> {
-        return client.get(at: "person", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
+    func translations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Translation<TranslatedPersonInfo>]> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
     }
 
-    func taggedImages(client: Client) -> EventLoopFuture<Paging<TaggedImage>> {
-        return client.get(at: "person", .constant(String(id)), "tagged_images")
+    func taggedImages(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<TaggedImage>> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "tagged_images")
     }
 }

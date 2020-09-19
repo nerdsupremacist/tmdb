@@ -24,27 +24,27 @@ class Episode: Decodable, GraphQLObject {
         case voteCount = "vote_count"
     }
 
-    func details(client: Client, context: MutableContext) -> EventLoopFuture<DetailedEpisode> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)))
+    func details(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<DetailedEpisode> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)))
     }
 
-    func externalIds(client: Client, context: MutableContext) -> EventLoopFuture<ExternalIDS> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "external_ids")
+    func externalIds(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<ExternalIDS> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "external_ids")
     }
 
-    func translations(client: Client, context: MutableContext) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "episode", .constant(String(episodeNumber)), "translations").map { (wrapper: Translations) in wrapper.translations }
+    func translations(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "episode", .constant(String(episodeNumber)), "translations").map { (wrapper: Translations) in wrapper.translations }
     }
 
-    func images(client: Client, context: MutableContext) -> EventLoopFuture<EpisodeImages> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "images")
+    func images(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<EpisodeImages> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "images")
     }
 
-    func videos(client: Client, context: MutableContext) -> EventLoopFuture<[Video]> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "videos").map { (wrapper: Videos) in wrapper.results }
+    func videos(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<[Video]> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "videos").map { (wrapper: Videos) in wrapper.results }
     }
 
-    func credits(client: Client, context: MutableContext) -> EventLoopFuture<EpisodeCredits<BasicPerson>> {
-        return client.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "credits")
+    func credits(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<EpisodeCredits<BasicPerson>> {
+        return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)), "credits")
     }
 }

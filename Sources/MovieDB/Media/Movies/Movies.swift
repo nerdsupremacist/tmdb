@@ -4,37 +4,37 @@ import GraphZahl
 import NIO
 
 class Movies: GraphQLObject {
-    let client: Client
+    let viewerContext: MovieDB.ViewerContext
 
-    init(client: Client) {
-        self.client = client
+    init(viewerContext: MovieDB.ViewerContext) {
+        self.viewerContext = viewerContext
     }
 
     func search(term: String) -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "search", "movie", query: ["query" : term])
+        return viewerContext.tmdb.get(at: "search", "movie", query: ["query" : term])
     }
 
     func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "trending", "movie", .constant(timeWindow.rawValue))
+        return viewerContext.tmdb.get(at: "trending", "movie", .constant(timeWindow.rawValue))
     }
 
     func movie(id: Int) -> EventLoopFuture<DetailedMovie> {
-        return client.get(at: "movie", .constant(String(id)))
+        return viewerContext.tmdb.get(at: "movie", .constant(String(id)))
     }
 
     func upcoming() -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", "upcoming")
+        return viewerContext.tmdb.get(at: "movie", "upcoming")
     }
 
     func topRated() -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", "top_rated")
+        return viewerContext.tmdb.get(at: "movie", "top_rated")
     }
 
     func popular() -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", "popular")
+        return viewerContext.tmdb.get(at: "movie", "popular")
     }
 
     func nowPlaying() -> EventLoopFuture<Paging<Movie>> {
-        return client.get(at: "movie", "now_playing")
+        return viewerContext.tmdb.get(at: "movie", "now_playing")
     }
 }
