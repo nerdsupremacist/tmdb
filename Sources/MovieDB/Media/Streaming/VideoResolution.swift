@@ -44,6 +44,8 @@ extension VideoResolution {
             return 3
         case .dvd:
             return 4
+        case .theatre:
+            return 5
         }
     }
 
