@@ -62,13 +62,8 @@ class StreamingOption: GraphQLObject {
         self.offerings = offerings
     }
 
-    func provider(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<StreamingProvider> {
-        return viewerContext.streamingProviders().flatMapThrowing { providers in
-            guard let provider = providers?.first(where: { $0.id == self.providerID }) else {
-                throw Abort(.notFound)
-            }
-            return provider
-        }
+    func provider(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<StreamingProvider?> {
+        return viewerContext.streamingProviders().map { $0?.first(where: { $0.id == self.providerID }) }
     }
 }
 
