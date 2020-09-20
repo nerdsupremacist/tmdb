@@ -111,11 +111,11 @@
       },
       {
         "package": "swift-backtrace",
-        "repositoryURL": "https://github.com/swift-server/swift-backtrace.git",
+        "repositoryURL": "https://github.com/nerdsupremacist/swift-backtrace.git",
         "state": {
-          "branch": null,
-          "revision": "f2fd8c4845a123419c348e0bc4b3839c414077d5",
-          "version": "1.2.0"
+          "branch": "main",
+          "revision": "0a50196933bb4ba0dbf296fa2c19a731fffef063",
+          "version": null
         }
       },
       {

@@ -17,7 +17,7 @@ let package = Package(
         .package(url: "https://github.com/nerdsupremacist/Cache.git", .branch("master")),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.29.1"),
         .package(url: "https://github.com/apple/swift-nio-ssl.git", from: "2.9.1"),
-        .package(url: "https://github.com/swift-server/swift-backtrace.git", from: "1.2.0"),
+        .package(url: "https://github.com/nerdsupremacist/swift-backtrace.git", .branch("main")),
     ],
     targets: [
         .target(
