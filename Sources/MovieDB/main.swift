@@ -5,7 +5,9 @@ import NIO
 import Vapor
 import Cache
 import GraphZahlVaporSupport
+import Backtrace
 
+Backtrace.install()
 let app = Application(try .detect())
 
 let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 10)
