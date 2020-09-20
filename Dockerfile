@@ -1,4 +1,4 @@
-FROM swift:5.2.5
+FROM swift:5.3
 WORKDIR /app
 ADD . ./
 
@@ -11,7 +11,7 @@ RUN apt-get -y install libz-dev
 
 RUN swift package clean
 
-RUN swift build -c debug -Xlinker -E
+RUN swift build -Xswiftc -g -Xlinker -E -Xcc -v -Xcxx -v
 
 EXPOSE 8080
 ENTRYPOINT ["./.build/debug/tmdb"]
