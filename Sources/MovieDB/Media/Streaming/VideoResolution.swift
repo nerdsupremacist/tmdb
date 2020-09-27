@@ -12,15 +12,9 @@ enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
 
     init(from decoder: Decoder) throws {
         let rawValue = try String(from: decoder)
-        switch rawValue {
-        case "canvas":
-            self = .theatre
+        if let specialCase = VideoResolution.specialCases[rawValue] {
+            self = specialCase
             return
-        case "4k":
-            self = .ultraHD
-            return
-        default:
-            break
         }
 
         guard let resolution = VideoResolution(rawValue: rawValue) else {
@@ -31,6 +25,15 @@ enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
 
         self = resolution
     }
+}
+
+extension VideoResolution {
+
+    private static let specialCases: [String : VideoResolution] = [
+        "canvas" : .theatre,
+        "4k" : .ultraHD,
+    ]
+
 }
 
 extension VideoResolution {
