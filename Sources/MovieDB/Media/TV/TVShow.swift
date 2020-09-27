@@ -85,10 +85,10 @@ class TVShow: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "similar")
     }
 
-    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<Any?> {
+    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> Output {
         context.push {
             .show ~> self
         }
-        return eventLoop.future(self)
+        return .object(self)
     }
 }
