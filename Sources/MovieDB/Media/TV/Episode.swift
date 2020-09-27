@@ -24,6 +24,11 @@ class Episode: Decodable, GraphQLObject {
         case voteCount = "vote_count"
     }
 
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<[StreamingOption]?> {
+        let show = context.show
+        return viewerContext.streampingOptionsForEpisode(showId: show.id, showName: show.name, seasonNumber: seasonNumber, episodeNumber: episodeNumber)
+    }
+
     func details(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<DetailedEpisode> {
         return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber)))
     }

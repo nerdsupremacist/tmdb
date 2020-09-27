@@ -19,6 +19,11 @@ class Season: Decodable, GraphQLObject {
         case seasonNumber = "season_number"
     }
 
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<[StreamingOption]?> {
+        let show = context.show
+        return viewerContext.streampingOptionsForSeason(showId: show.id, showName: show.name, seasonNumber: seasonNumber)
+    }
+
     func details(viewerContext: MovieDB.ViewerContext, context: MutableContext) -> EventLoopFuture<DetailedSeason> {
         return viewerContext.tmdb.get(at: "tv", .constant(String(context.show.id)), "season", .constant(String(seasonNumber)))
     }
