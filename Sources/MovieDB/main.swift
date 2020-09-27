@@ -12,7 +12,7 @@ let app = Application(try .detect())
 
 let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 let cacheConfig = MemoryConfig(expiry: .never, countLimit: 500, totalCostLimit: 100_000)
-let cache = MemoryStorage<Client.CacheEntry, HTTPClient.Response>(config: cacheConfig)
+let cache = MemoryStorage<Client.CacheEntry, Any>(config: cacheConfig)
 
 let tmdbBase = URL(string: "https://api.themoviedb.org/3/")!
 let tmdbImageBase = URL(string: "https://image.tmdb.org/t/p/")!

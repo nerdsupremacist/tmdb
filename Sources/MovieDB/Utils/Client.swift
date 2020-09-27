@@ -23,7 +23,7 @@ class Client {
 
     let base: URL
     let authenticator: Authenticator?
-    let cache: MemoryStorage<CacheEntry, HTTPClient.Response>?
+    let cache: MemoryStorage<CacheEntry, Any>?
 
     var eventLoop: EventLoopGroup {
         return httpClient.eventLoopGroup
@@ -31,7 +31,7 @@ class Client {
 
     private let httpClient: HTTPClient
 
-    init(base: URL, authenticator: Authenticator? = nil, httpClient: HTTPClient, cache: MemoryStorage<CacheEntry, HTTPClient.Response>? = nil) {
+    init(base: URL, authenticator: Authenticator? = nil, httpClient: HTTPClient, cache: MemoryStorage<CacheEntry, Any>? = nil) {
         self.base = base
         self.authenticator = authenticator
         self.httpClient = httpClient
@@ -66,10 +66,8 @@ class Client {
         guard let url = components.url else { return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed)) }
         let entry = CacheEntry(method: method, url: url, body: body)
 
-        if let cached = try? cache?.object(forKey: entry) {
-            return eventLoop.tryFuture {
-                try cached.decode(type: type)
-            }
+        if let cached = try? cache?.object(forKey: entry) as? T {
+            return eventLoop.future(cached)
         }
 
         return httpClient.eventLoopGroup.tryFuture {
@@ -84,11 +82,11 @@ class Client {
             }
 
             return httpClient.execute(request: request)
+                .decode(type: type)
                 .always { [weak cache] result in
                     guard case .success(let response) = result else { return }
                     cache?.setObject(response, forKey: entry, expiry: expiry)
                 }
-                .decode(type: type)
         }
         .flatMap { $0 }
     }
