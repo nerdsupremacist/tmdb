@@ -24,7 +24,7 @@ class Movie: Decodable, GraphQLObject {
     let poster: Image<PosterSize>?
     let isAdult: Bool
     let overview: String
-    let releaseDate: Date?
+    let releaseDate: OptionalDate
     let id: Int
     let originalTitle, originalLanguage, title: String
     let backdrop: Image<BackdropSize>?
