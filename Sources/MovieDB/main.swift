@@ -10,7 +10,7 @@ import Backtrace
 Backtrace.install()
 let app = Application(try .detect())
 
-let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 10)
+let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 let cacheConfig = MemoryConfig(expiry: .never, countLimit: 500, totalCostLimit: 100_000)
 let cache = MemoryStorage<Client.CacheEntry, HTTPClient.Response>(config: cacheConfig)
 
