@@ -80,7 +80,7 @@ struct DecodedStreamingOption: Decodable {
     let providerID: Int
 
     let retailPrice: Double?
-    let currency: String
+    let currency: String?
 
     let links: StreamingLinks
     let resolution: VideoResolution

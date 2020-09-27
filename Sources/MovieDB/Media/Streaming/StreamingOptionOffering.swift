@@ -9,7 +9,7 @@ class StreamingOptionOffering: GraphQLObject {
     let links: StreamingLinks
 
     init(decoded: DecodedStreamingOption) {
-        self.price = decoded.retailPrice.map { Price(amount: $0, currency: decoded.currency) }
+        self.price = decoded.retailPrice.flatMap { amount in decoded.currency.map { currency in Price(amount: amount, currency: currency) } }
         self.type = decoded.type
         self.resolution = decoded.resolution
         self.links = decoded.links
