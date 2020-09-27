@@ -15,6 +15,7 @@ enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
         switch rawValue {
         case "canvas":
             self = .theatre
+            return
         case "4k":
             self = .ultraHD
             return
@@ -23,7 +24,9 @@ enum VideoResolution: String, Decodable, CaseIterable, GraphQLEnum {
         }
 
         guard let resolution = VideoResolution(rawValue: rawValue) else {
-            throw DecodingError.typeMismatch(VideoResolution.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Value \(rawValue) is not supported by VideoResolution"))
+            throw DecodingError.typeMismatch(VideoResolution.self,
+                                             DecodingError.Context(codingPath: decoder.codingPath,
+                                                                   debugDescription: "Value \(rawValue) is not supported by VideoResolution"))
         }
 
         self = resolution
