@@ -14,6 +14,27 @@ class Video: Decodable, GraphQLObject {
         case iso3166_1 = "iso_3166_1"
         case key, name, site, size, type
     }
+
+    func thumbnail() -> URL? {
+        switch site {
+        case "YouTube":
+            return URL(string: "https://img.youtube.com/vi/\(key)/maxresdefault.jpg")
+        default:
+            return nil
+        }
+    }
+
+    func links() -> StreamingLinks? {
+        switch site {
+        case "YouTube":
+            return StreamingLinks(web: URL(string: "www.youtube.com/watch?v=\(key)")!,
+                                  androidTV: URL(string: key),
+                                  tvOS: URL(string: "youtube://watch/\(key)"),
+                                  fireTV: nil)
+        default:
+            return nil
+        }
+    }
 }
 
 class Videos: Decodable {

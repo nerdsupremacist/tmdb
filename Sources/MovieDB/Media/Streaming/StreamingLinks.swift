@@ -14,4 +14,11 @@ class StreamingLinks: Decodable, GraphQLObject {
     let androidTV: URL?
     let tvOS: URL?
     let fireTV: URL?
+
+    init(web: URL, androidTV: URL?, tvOS: URL?, fireTV: URL?) {
+        self.web = web
+        self.androidTV = androidTV
+        self.tvOS = tvOS
+        self.fireTV = fireTV
+    }
 }
