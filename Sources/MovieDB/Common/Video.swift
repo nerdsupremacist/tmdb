@@ -27,7 +27,7 @@ class Video: Decodable, GraphQLObject {
     func links() -> StreamingLinks? {
         switch site {
         case "YouTube":
-            return StreamingLinks(web: URL(string: "www.youtube.com/watch?v=\(key)")!,
+            return StreamingLinks(web: URL(string: "https://www.youtube.com/watch?v=\(key)")!,
                                   androidTV: URL(string: key),
                                   tvOS: URL(string: "youtube://watch/\(key)"),
                                   fireTV: nil)
