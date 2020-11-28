@@ -40,7 +40,7 @@ struct GeoLocationAPIKeyAuthenticator: Authenticator {
     }
 }
 
-app.routes.graphql(use: MovieDB.self, eventLoopGroup: nil, includeGraphiQL: true) { request -> MovieDB.ViewerContext in
+app.routes.graphql(use: MovieDB.self, eventLoopGroup: nil, ideEnabled: .always(.playground)) { request -> MovieDB.ViewerContext in
     let tmdbHTTPClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
     let tmdb = Client(base: tmdbBase,
                       authenticator: TMDBAPIKeyAuthenticator(apiKey: apiKey),
