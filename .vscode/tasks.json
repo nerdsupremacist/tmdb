@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "swift build -Xlinker -E -Xswiftc -g -Xswiftc -Xfrontend -Xswiftc -serialize-debugging-options",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "swift test"
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "swift run"
+        }
+    ]
+}

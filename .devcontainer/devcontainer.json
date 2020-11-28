@@ -1,0 +1,24 @@
+{
+  "name": "Swift",
+  "dockerFile": "Dockerfile",
+  "runArgs": [
+    "-u", "vscode",
+    "--privileged",
+    "--cap-add=SYS_PTRACE", 
+    "--security-opt", 
+    "seccomp=unconfined"
+  ],
+  "settings": {
+    "lldb.library": "/usr/lib/liblldb.so",
+    "lldb.launch.sourceLanguages": [
+      "swift",
+    ],
+    "lldb.launch.initCommands": ["settings set target.disable-aslr false"],
+    "terminal.integrated.shell.linux": "/bin/bash",
+	},
+  "appPort": ["8080:8080"],
+  "extensions": [
+		"pvasek.sourcekit-lsp--dev-unofficial",
+		"vadimcn.vscode-lldb"
+	]
+}
