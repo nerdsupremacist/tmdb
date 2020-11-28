@@ -66,7 +66,7 @@ class Client {
         guard let url = components.url else { return httpClient.eventLoopGroup.future(error: Error.invalidURL(composed)) }
         let entry = CacheEntry(method: method, url: url, body: body)
 
-        if let cached = try? cache?.object(forKey: entry) as? T {
+        if let cached = cache?.nonExpiredObject(entry) as? T {
             return eventLoop.future(cached)
         }
 
@@ -153,3 +153,14 @@ extension HTTPClient.Response {
 }
 
 extension HTTPMethod: Hashable { }
+
+extension StorageAware {
+
+    func nonExpiredObject(_ key: Key) -> Value? {
+        guard let entry = try? self.entry(forKey: key), !entry.expiry.isExpired else {
+            return nil
+        }
+        return entry.object
+    }
+
+}
