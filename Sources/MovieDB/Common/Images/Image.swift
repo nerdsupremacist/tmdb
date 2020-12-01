@@ -56,7 +56,19 @@ extension Image: OutputResolvable where Size: InputResolvable & ConcreteResolvab
     }
 
     func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> Output {
-        let url = self.url(size: try Size.create(from: arguments["size"]!), viewerContext: context.anyViewerContext as! MovieDB.ViewerContext)
+        let url = self.url(size: try Size.create(from: arguments["size"]), viewerContext: context.anyViewerContext as! MovieDB.ViewerContext)
         return try url.resolve(source: source, arguments: arguments, context: context, eventLoop: eventLoop)
     }
+}
+
+extension InputResolvable {
+
+    static func create(from map: Map?) throws -> Self {
+        if let map = map {
+            return try create(from: map)
+        }
+
+        return try createFromMissingKey()
+    }
+
 }
