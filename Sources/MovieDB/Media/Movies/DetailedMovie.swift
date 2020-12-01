@@ -23,7 +23,7 @@ class DetailedMovie: Movie {
         case cancelled = "Cancelled"
     }
 
-    let budget: Int
+    let budget: Int?
     let genres: [Genre]
 //    let homepage: URL?
     let imdbID: String
@@ -36,7 +36,7 @@ class DetailedMovie: Movie {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        budget = try container.decode(Int.self, forKey: .budget)
+        budget = try container.decode(Int?.self, forKey: .budget)
         genres = try container.decode([Genre].self, forKey: .genres)
 //        homepage = try container.decode(URL?.self, forKey: .homepage)
         imdbID = try container.decode(String.self, forKey: .imdbID)
