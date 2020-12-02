@@ -148,6 +148,10 @@ extension HTTPClient.Response {
 
             return data
         } catch {
+            if let otherError = try? buffer.getJSONDecodable(TMDBError.self, decoder: Self.decoder, at: 0, length: length) {
+                throw otherError
+            }
+            
             print(error)
             throw error
         }
@@ -157,6 +161,20 @@ extension HTTPClient.Response {
 
 extension HTTPMethod: Hashable { }
 
-
+struct TMDBError: Error, Decodable, LocalizedError, CustomStringConvertible {
+    enum CodingKeys: String, CodingKey {
+        case code = "status_code"
+        case message = "status_message"
     }
 
+    let code: Int
+    let message: String
+
+    var description: String {
+        return "\(message) (\(-code))"
+    }
+
+    var errorDescription: String? {
+        return description
+    }
+}
