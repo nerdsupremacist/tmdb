@@ -6,7 +6,7 @@ import Vapor
 extension MovieDB.ViewerContext {
 
     func locale() -> EventLoopFuture<String?> {
-        if let ipAddress = request.headers.forwarded.first?.for ?? request.remoteAddress?.ipAddress, ipAddress != "127.0.0.1" {
+        if let ipAddress = request.headers.forwarded.first?.for ?? request.remoteAddress?.ipAddress, ipAddress != "127.0.0.1", ipAddress != "172.17.0.1" {
             return geoLocation.get(at: "ipgeo", query: ["ip" : ipAddress], expiry: .pseudoDays(14))
                 .map { (located: GeoLocated) in
                     return located.locale
