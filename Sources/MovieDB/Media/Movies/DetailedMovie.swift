@@ -25,24 +25,26 @@ class DetailedMovie: Movie {
 
     let budget: Int?
     let genres: [Genre]
-//    let homepage: URL?
+    let homepage: URL?
     let imdbID: String
     let productionCompanies: [ProductionCompany]
     let productionCountries: [ProductionCountry]
-    let revenue, runtime: Int
+    let revenue: Int?
+    let runtime: Int
     let spokenLanguages: [SpokenLanguage]
     let status: Status
     let tagline: String
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        budget = try container.decode(Int?.self, forKey: .budget)
+        budget = try container.decodeIfPresent(Int.self, forKey: .budget)
         genres = try container.decode([Genre].self, forKey: .genres)
-//        homepage = try container.decode(URL?.self, forKey: .homepage)
+        let homepageString = try container.decodeIfPresent(String.self, forKey: .homepage)
+        homepage = homepageString.flatMap(URL.init(string:))
         imdbID = try container.decode(String.self, forKey: .imdbID)
         productionCompanies = try container.decode([ProductionCompany].self, forKey: .productionCompanies)
         productionCountries = try container.decode([ProductionCountry].self, forKey: .productionCountries)
-        revenue = try container.decode(Int.self, forKey: .revenue)
+        revenue = try container.decodeIfPresent(Int.self, forKey: .revenue)
         runtime = try container.decode(Int.self, forKey: .runtime)
         spokenLanguages = try container.decode([SpokenLanguage].self, forKey: .spokenLanguages)
         status = try container.decode(Status.self, forKey: .status)

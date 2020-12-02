@@ -9,7 +9,7 @@ class DetailedTVShow: TVShow {
     let createdBy: [BaseCredit<BasicPerson>]
     let episodeRunTime: [Int]
     let genres: [Genre]
-//    let homepage: URL?
+    let homepage: URL?
     let inProduction: Bool
     let languages: [String]
     let lastAirDate: Date?
@@ -42,12 +42,13 @@ class DetailedTVShow: TVShow {
         createdBy = try container.decode([BaseCredit<BasicPerson>].self, forKey: .createdBy)
         episodeRunTime = try container.decode([Int].self, forKey: .episodeRunTime)
         genres = try container.decode([Genre].self, forKey: .genres)
-//        homepage = try container.decode(URL?.self, forKey: .homepage)
+        let homepageString = try container.decodeIfPresent(String.self, forKey: .homepage)
+        homepage = homepageString.flatMap(URL.init(string:))
         inProduction = try container.decode(Bool.self, forKey: .inProduction)
         languages = try container.decode([String].self, forKey: .languages)
         lastAirDate = try container.decode(Date?.self, forKey: .lastAirDate)
-        lastEpisodeToAir = try container.decode(Episode?.self, forKey: .lastEpisodeToAir)
-        nextEpisodeToAir = try container.decode(Episode?.self, forKey: .nextEpisodeToAir)
+        lastEpisodeToAir = try container.decodeIfPresent(Episode.self, forKey: .lastEpisodeToAir)
+        nextEpisodeToAir = try container.decodeIfPresent(Episode.self, forKey: .nextEpisodeToAir)
         networks = try container.decode([Network].self, forKey: .networks)
         numberOfEpisodes = try container.decode(Int.self, forKey: .numberOfEpisodes)
         numberOfSeasons = try container.decode(Int.self, forKey: .numberOfSeasons)

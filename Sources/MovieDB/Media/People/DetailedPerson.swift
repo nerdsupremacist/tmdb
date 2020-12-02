@@ -27,15 +27,15 @@ class DetailedPerson: Person {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        birthday = try container.decode(Date?.self, forKey: .birthday)
+        birthday = try container.decodeIfPresent(Date.self, forKey: .birthday)
         knownForDepartment = try container.decode(String.self, forKey: .knownForDepartment)
-        deathday = try container.decode(Date?.self, forKey: .deathday)
+        deathday = try container.decodeIfPresent(Date.self, forKey: .deathday)
         alsoKnownAs = try container.decode([String].self, forKey: .alsoKnownAs)
         gender = try container.decode(Gender.self, forKey: .gender)
         biography = try container.decode(String.self, forKey: .biography)
-        placeOfBirth = try container.decode(String?.self, forKey: .placeOfBirth)
-        imdbID = try container.decode(String?.self, forKey: .imdbID)
-        homepage = try container.decode(URL?.self, forKey: .homepage)
+        placeOfBirth = try container.decodeIfPresent(String.self, forKey: .placeOfBirth)
+        imdbID = try container.decodeIfPresent(String.self, forKey: .imdbID)
+        homepage = try container.decodeIfPresent(URL.self, forKey: .homepage)
         try super.init(from: decoder)
     }
 }
