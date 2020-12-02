@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/.build/x86_64-unknown-linux-gnu/debug/tmdb",
-            "args": ["serve", "--env", "production", "--hostname", "0.0.0.0"],
+            "args": ["serve", "--env", "development", "--hostname", "0.0.0.0"],
             "env": {
                 "API_KEY": "18ec732ece653360e23d5835670c47a0",
             },
