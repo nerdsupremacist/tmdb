@@ -8,8 +8,8 @@ sites:
     headers:
       - "Host: tmdb.apps.quintero.io"
       - "Content-Type: application/json"
-      - "Content-Length: 55"
-    body: '{ "query": "{ movies { movie(id: 12) { title } } }" }'
+      - "Content-Length: 53"
+    body: { "query": "{ movies { movie(id: 12) { title } } }" }
     __dangerous__body_down: "error"
 assignees:
   - nerdsupremacist
