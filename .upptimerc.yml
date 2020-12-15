@@ -1,0 +1,13 @@
+owner: nerdsupremacist
+repo: memes
+user-agent: ci
+sites:
+  - name: GraphQL API
+    url: https://tmdb.apps.quintero.io
+    method: POST
+    headers:
+      - "Content-Type: application/json"
+    body: '{ "query": "{ movie(id: 12) { title } }" }'
+    __dangerous__body_down: "error"
+assignees:
+  - nerdsupremacist
