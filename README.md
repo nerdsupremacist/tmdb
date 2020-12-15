@@ -3,7 +3,7 @@
 ![](screenshot.png)
 
 A GraphQL Wrapper for [The Movie Database](https://www.themoviedb.org)...
-Available at this heroku [instance](https://tmdb-graph.herokuapp.com). 
+Available at this heroku [instance](https://tmdb-graph.herokuapp.com).
 
 Since it's hosted by heroku, it's pretty slow and times out pretty often... It's just a demo...
 
