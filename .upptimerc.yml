@@ -3,10 +3,11 @@ repo: memes
 user-agent: ci
 sites:
   - name: GraphQL API
-    url: https://tmdb.apps.quintero.io
     method: POST
+    url: https://tmdb.apps.quintero.io
     headers:
       - "Content-Type: application/json"
+      - "Content-Length: 53"
     body: '{ "query": "{ movies { movie(id: 12) { title } } }" }'
     __dangerous__body_down: "error"
 assignees:
