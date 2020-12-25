@@ -40,7 +40,8 @@ struct GeoLocationAPIKeyAuthenticator: Authenticator {
     }
 }
 
-app.routes.graphql(use: MovieDB.self, eventLoopGroup: nil, ideEnabled: .always(.playground)) { request -> MovieDB.ViewerContext in
+let corsConfiguration = CORSMiddleware.Configuration(allowedOrigin: .all, allowedMethods: [.POST], allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith])
+app.grouped(CORSMiddleware(configuration: corsConfiguration)).graphql(use: MovieDB.self, eventLoopGroup: nil, ideEnabled: .always(.playground)) { request -> MovieDB.ViewerContext in
     let tmdbHTTPClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
     let tmdb = Client(base: tmdbBase,
                       authenticator: TMDBAPIKeyAuthenticator(apiKey: apiKey),
