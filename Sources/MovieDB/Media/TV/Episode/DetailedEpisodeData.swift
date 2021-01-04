@@ -1,7 +1,7 @@
 
 import Foundation
 
-class DetailedEpisode: Episode {
+class DetailedEpisodeData: EpisodeData {
     let crew: [CrewCredit<BasicPerson>]
     let guestStars: [CastCredit<BasicPerson>]
 

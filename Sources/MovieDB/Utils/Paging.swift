@@ -39,6 +39,38 @@ struct Paging<Node: Decodable & OutputResolvable & ConcreteResolvable>: FixedPag
     }
 }
 
+extension FixedPageSizeIndexedConnection {
+
+    func map<T : OutputResolvable & ConcreteResolvable>(_ transform: @escaping (Node) -> T) -> some FixedPageSizeIndexedConnection {
+        return MappedFixedPageSizeIndexedConnection(prev: self, transform: transform)
+    }
+
+}
+
+struct MappedFixedPageSizeIndexedConnection<
+    Node: OutputResolvable & ConcreteResolvable, Prev: FixedPageSizeIndexedConnection
+>: FixedPageSizeIndexedConnection {
+
+    let prev: Prev
+    let transform: (Prev.Node) -> Node
+
+    var identifier: some Hashable {
+        return prev.identifier
+    }
+
+    func totalCount(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return prev.totalCount(eventLoop: eventLoop)
+    }
+
+    func pageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return prev.pageSize(eventLoop: eventLoop)
+    }
+
+    func page(at index: Int, eventLoop: EventLoopGroup) -> EventLoopFuture<[Node?]> {
+        return prev.page(at: index, eventLoop: eventLoop).map { $0.map { $0.map(self.transform) } }
+    }
+}
+
 struct Page<T: Decodable>: Decodable {
     private enum CodingKeys: String, CodingKey {
         case results, page

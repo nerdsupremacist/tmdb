@@ -1,16 +1,16 @@
 
 import Foundation
 
-class SeasonResult: Season {
-    let episodeCount: Int
+class DetailedSeasonData: SeasonData {
+    let episodes: [EpisodeData]
 
     private enum CodingKeys: String, CodingKey {
-        case episodeCount = "episode_count"
+        case episodes
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        episodeCount = try container.decode(Int.self, forKey: .episodeCount)
+        episodes = try container.decode([EpisodeData].self, forKey: .episodes)
         try super.init(from: decoder)
     }
 }

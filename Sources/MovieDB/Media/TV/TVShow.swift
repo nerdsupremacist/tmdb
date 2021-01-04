@@ -42,7 +42,9 @@ class TVShow: Decodable, GraphQLObject {
     }
 
     func season(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<DetailedSeason> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "season", .constant(String(number)))
+        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "season", .constant(String(number))).map { data in
+            DetailedSeason(data: data, showName: self.name, showId: self.id)
+        }
     }
 
     func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
@@ -83,12 +85,5 @@ class TVShow: Decodable, GraphQLObject {
 
     func similar(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<TVShow>> {
         return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "similar")
-    }
-
-    func resolve(source: Any, arguments: [String : Map], context: MutableContext, eventLoop: EventLoopGroup) throws -> Output {
-        context.push {
-            .show ~> self
-        }
-        return .object(self)
     }
 }
