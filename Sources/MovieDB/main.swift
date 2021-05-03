@@ -40,8 +40,12 @@ struct GeoLocationAPIKeyAuthenticator: Authenticator {
     }
 }
 
-let corsConfiguration = CORSMiddleware.Configuration(allowedOrigin: .all, allowedMethods: [.POST], allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith])
-app.grouped(CORSMiddleware(configuration: corsConfiguration)).graphql(use: MovieDB.self, eventLoopGroup: nil, ideEnabled: .always(.playground)) { request -> MovieDB.ViewerContext in
+let corsConfiguration = CORSMiddleware.Configuration(allowedOrigin: .all,
+                                                     allowedMethods: [.POST],
+                                                     allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith])
+
+let cors = app.grouped(CORSMiddleware(configuration: corsConfiguration))
+cors.graphql(use: MovieDB.self, eventLoopGroup: nil, ideEnabled: .always(.playground)) { request -> MovieDB.ViewerContext in
     let tmdbHTTPClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
     let tmdb = Client(base: tmdbBase,
                       authenticator: TMDBAPIKeyAuthenticator(apiKey: apiKey),
@@ -61,5 +65,7 @@ app.grouped(CORSMiddleware(configuration: corsConfiguration)).graphql(use: Movie
 
     return MovieDB.ViewerContext(request: request, tmdbImageBase: tmdbImageBase, justWatchImageBase: justWatchImageBase, tmdb: tmdb, justWatch: justWatch, geoLocation: geoLocation)
 }
+
+cors.on(.OPTIONS) { _ in Response(status: .noContent) }
 
 try app.run()
