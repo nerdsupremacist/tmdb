@@ -20,7 +20,7 @@ class Movies: GraphQLObject {
 
     func movie(id: ID) -> EventLoopFuture<DetailedMovie> {
         return id
-            .idValue(for: .show, eventLoop: viewerContext.request.eventLoop)
+            .idValue(for: .movie, eventLoop: viewerContext.request.eventLoop)
             .flatMap { self.viewerContext.tmdb.movie(id: $0) }
     }
 
