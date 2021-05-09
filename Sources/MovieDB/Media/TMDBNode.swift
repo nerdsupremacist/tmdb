@@ -20,8 +20,8 @@ extension TMDBNode {
     }
 
     static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<GraphZahl.Node?> {
-        guard let id = ID(id), id.namespace == Self.namespace else { return eventLoop.future(nil) }
-        return find(id: id.id, viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
+        guard let wrapped = ID(id), id.namespace == Self.namespace else { return eventLoop.future(nil) }
+        return find(id: wrapped.id, viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
     }
 
 }
