@@ -81,3 +81,19 @@ class Movie: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "similar")
     }
 }
+
+extension Movie: TMDBNode {
+    static let namespace: ID.Namespace = .movie
+
+    static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
+        return viewerContext.tmdb.movie(id: id).map { $0 }
+    }
+}
+
+extension Client {
+
+    func movie(id: Int) -> EventLoopFuture<DetailedMovie> {
+        return get(at: "movie", .constant(String(id)))
+    }
+
+}

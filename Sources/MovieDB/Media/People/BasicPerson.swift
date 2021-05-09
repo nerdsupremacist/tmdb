@@ -37,3 +37,19 @@ class BasicPerson: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "person", .constant(String(id)), "tagged_images")
     }
 }
+
+extension BasicPerson: TMDBNode {
+    static let namespace: ID.Namespace = .person
+
+    static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
+        return viewerContext.tmdb.person(id: id).map { $0 }
+    }
+}
+
+extension Client {
+
+    func person(id: Int) -> EventLoopFuture<DetailedPerson> {
+        return get(at: "person", .constant(String(id)))
+    }
+
+}

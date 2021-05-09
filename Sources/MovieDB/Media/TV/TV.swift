@@ -18,8 +18,10 @@ class TV: GraphQLObject {
         return viewerContext.tmdb.get(at: "trending", "tv", .constant(timeWindow.rawValue))
     }
 
-    func show(id: Int) -> EventLoopFuture<DetailedTVShow> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)))
+    func show(id: ID) -> EventLoopFuture<DetailedTVShow> {
+        return id
+            .idValue(for: .show, eventLoop: viewerContext.request.eventLoop)
+            .flatMap { self.viewerContext.tmdb.show(id: $0) }
     }
 
     func upcoming() -> EventLoopFuture<Paging<TVShow>> {

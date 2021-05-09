@@ -18,8 +18,8 @@ class People: GraphQLObject {
         return viewerContext.tmdb.get(at: "trending", "person", .constant(timeWindow.rawValue))
     }
 
-    func person(id: Int) -> EventLoopFuture<DetailedPerson> {
-        return viewerContext.tmdb.get(at: "person", .constant(String(id)))
+    func person(id: ID) -> EventLoopFuture<DetailedPerson> {
+        return id.idValue(for: .person, eventLoop: viewerContext.request.eventLoop).flatMap { self.viewerContext.tmdb.person(id: $0) }
     }
 
     func popular() -> EventLoopFuture<Paging<PersonListResult>> {

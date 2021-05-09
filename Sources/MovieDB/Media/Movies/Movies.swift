@@ -18,10 +18,10 @@ class Movies: GraphQLObject {
         return viewerContext.tmdb.get(at: "trending", "movie", .constant(timeWindow.rawValue))
     }
 
-    func movie(id: Int) -> EventLoopFuture<Movie> {
-        return viewerContext.tmdb.get(at: "movie", .constant(String(id))).map { (movie: DetailedMovie) in
-            return movie
-        }
+    func movie(id: ID) -> EventLoopFuture<DetailedMovie> {
+        return id
+            .idValue(for: .show, eventLoop: viewerContext.request.eventLoop)
+            .flatMap { self.viewerContext.tmdb.movie(id: $0) }
     }
 
     func upcoming() -> EventLoopFuture<Paging<Movie>> {

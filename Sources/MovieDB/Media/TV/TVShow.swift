@@ -87,3 +87,19 @@ class TVShow: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "similar")
     }
 }
+
+extension TVShow: TMDBNode {
+    static let namespace: ID.Namespace = .show
+
+    static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
+        return viewerContext.tmdb.show(id: id).map { $0 }
+    }
+}
+
+extension Client {
+
+    func show(id: Int) -> EventLoopFuture<DetailedTVShow> {
+        return get(at: "tv", .constant(String(id)))
+    }
+
+}
