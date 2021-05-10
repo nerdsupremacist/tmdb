@@ -77,9 +77,9 @@
         "package": "GraphZahl",
         "repositoryURL": "https://github.com/nerdsupremacist/GraphZahl.git",
         "state": {
-          "branch": "develop",
-          "revision": "5b033e8aaa5937283ca4d9fa76f18d4547dbc06c",
-          "version": null
+          "branch": null,
+          "revision": "51042a6eac9d05af5c4177dc693ab4afaa0fbf1c",
+          "version": "0.1.0-alpha.44"
         }
       },
       {
