@@ -15,7 +15,7 @@ protocol TMDBNode: GraphZahl.Node {
 extension TMDBNode {
 
     func id(context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
-        let id = ID(namespace: Self.namespace, ids: [id])
+        let id = ID(namespace: Self.namespace, ids: [self.id])
         return eventLoop.future(id.string())
     }
 
