@@ -12,7 +12,7 @@ let package = Package(
             targets: ["MovieDB"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nerdsupremacist/GraphZahl.git", from: "0.1.0-alpha.43"),
+        .package(url: "https://github.com/nerdsupremacist/GraphZahl.git", .branch("develop")),
         .package(url: "https://github.com/nerdsupremacist/graphzahl-vapor-support.git", from: "0.1.0-alpha.8"),
         .package(url: "https://github.com/nerdsupremacist/Cache.git", .branch("master")),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.29.1"),

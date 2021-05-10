@@ -1,98 +1,37 @@
 
 import Foundation
-import GraphZahl
 import NIO
-import GraphQL
-import ContextKit
+import GraphZahl
+import Vapor
+import Cache
 
-class TVShow: Decodable, GraphQLObject {
-    let poster: Image<PosterSize>?
-    let popularityIndex: Double?
-    let id: Int
-    let backdrop: Image<BackdropSize>?
-    let rating: Double
-    let overview: String
-    let firstAirDate: OptionalDate
-    let originCountry: [String]
-    let originalLanguage: String
-    let numberOfRatings: Int
-    let name, originalName: String
+class TVShow: GraphQLObject, Node {
+    @Inline
+    var show: BasicTVShow
 
-    private enum CodingKeys: String, CodingKey {
-        case poster = "poster_path"
-        case popularityIndex = "popularity"
-        case id
-        case backdrop = "backdrop_path"
-        case rating = "vote_average"
-        case overview
-        case firstAirDate = "first_air_date"
-        case originCountry = "origin_country"
-        case originalLanguage = "original_language"
-        case numberOfRatings = "vote_count"
-        case name
-        case originalName = "original_name"
+    @LazyInline
+    var details: DetailedTVShow
+
+    init(show: BasicTVShow, viewerContext: MovieDB.ViewerContext) {
+        self.show = show
+        self._details = LazyInline { viewerContext.tmdb.show(id: show.id) }
     }
 
-    func details(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<DetailedTVShow> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)))
-    }
-
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streamingOptions(id: id, name: name, contentType: .show)
-    }
-
-    func season(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<DetailedSeason> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "season", .constant(String(number))).map { data in
-            DetailedSeason(data: data, showName: self.name, showId: self.id)
-        }
-    }
-
-    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "external_ids")
-    }
-
-    func alternativeTitles(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[AlternativeTitle]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "alternative_titles").map { (wrapper: AlternativeTitles) in wrapper.titles }
-    }
-
-    func translations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
-    }
-
-    func images(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<MediaImages> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "images")
-    }
-
-    func keywords(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Keyword]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "keywords").map { (wrapper: Keywords) in wrapper.keywords }
-    }
-
-    func videos(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Video]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "videos").map { (wrapper: Videos) in wrapper.results }
-    }
-
-    func reviews(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<Review>> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "reviews")
-    }
-
-    func credits(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Credits<BasicPerson>> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "credits")
-    }
-
-    func recommendations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<TVShow>> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "recommendations")
-    }
-
-    func similar(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<TVShow>> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "similar")
+    init(details: DetailedTVShow, viewerContext: MovieDB.ViewerContext) {
+        self.show = details
+        self._details = LazyInline { viewerContext.request.eventLoop.future(details) }
     }
 }
 
 extension TVShow: TMDBNode {
-    static let namespace: ID.Namespace = .show
+    static let namespace: ID.Namespace = .movie
+
+    var id: Int {
+        return show.id
+    }
 
     static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
-        return viewerContext.tmdb.show(id: id).map { $0 }
+        return viewerContext.tmdb.show(id: id).map { TVShow(details: $0, viewerContext: viewerContext) }
     }
 }
 
@@ -102,4 +41,16 @@ extension Client {
         return get(at: "tv", .constant(String(id)))
     }
 
+}
+
+extension TVShow {
+    typealias Connection = AnyFixedPageSizeIndexedConnection<TVShow>
+}
+
+extension MovieDB.ViewerContext {
+    func shows(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .minutes(30)) -> EventLoopFuture<TVShow.Connection> {
+        return tmdb.get(at: path, query: query, expiry: expiry, type: Paging<BasicTVShow>.self).map { paging in
+            return paging.map { TVShow(show: $0, viewerContext: self) }
+        }
+    }
 }

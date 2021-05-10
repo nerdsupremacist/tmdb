@@ -4,13 +4,13 @@ import GraphZahl
 
 class DetailedEpisode: GraphQLObject {
     @Inline
-    var episode: Episode
+    var episode: BasicEpisode
 
     @Inline
     var data: DetailedEpisodeData
 
     init(data: DetailedEpisodeData, showName: String, showId: Int) {
-        self.episode = Episode(data: data, showName: showName, showId: showId)
+        self.episode = BasicEpisode(data: data, showName: showName, showId: showId)
         self.data = data
     }
 }

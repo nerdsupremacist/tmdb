@@ -2,21 +2,35 @@
 import Foundation
 import GraphZahl
 
-class BaseCredit<Value: Decodable & ConcreteResolvable & OutputResolvable>: Decodable, GraphQLObject {
+final class BaseCredit<Value: ConcreteResolvable & OutputResolvable>: GraphQLObject {
     static var concreteTypeName: String {
-        return String(describing: Self.self).replacingOccurrences(of: "<", with: "").replacingOccurrences(of: ">", with: "")
+        return "CreditWith\(Value.concreteTypeName)"
     }
 
     let id: String
     let value: Value
 
+    init(id: String, value: Value) {
+        self.id = id
+        self.value = value
+    }
+}
+
+extension BaseCredit: Decodable where Value: Decodable {
     private enum CodingKeys: String, CodingKey {
         case id = "credit_id"
     }
 
-    required init(from decoder: Decoder) throws {
+    convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        value = try Value(from: decoder)
+        self.init(id: try container.decode(String.self, forKey: .id), value: try Value(from: decoder))
     }
+}
+
+extension BaseCredit {
+
+    func map<T : ConcreteResolvable & OutputResolvable>(_ transform: (Value) throws -> T) rethrows -> BaseCredit<T> {
+        return BaseCredit<T>(id: id, value: try transform(value))
+    }
+
 }

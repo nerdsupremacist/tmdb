@@ -1,8 +1,8 @@
 
 import Foundation
 
-class PersonListResult: Person {
-    let knownFor: [MovieOrTV]
+class PersonListResult: MediumPerson {
+    let knownFor: [MovieOrTV<DecodableTypeNamespace>]
 
     private enum CodingKeys: String, CodingKey {
         case knownFor = "known_for"
@@ -10,7 +10,7 @@ class PersonListResult: Person {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        knownFor = try container.decode([MovieOrTV].self, forKey: .knownFor)
+        knownFor = try container.decode([MovieOrTV<DecodableTypeNamespace>].self, forKey: .knownFor)
         try super.init(from: decoder)
     }
 }

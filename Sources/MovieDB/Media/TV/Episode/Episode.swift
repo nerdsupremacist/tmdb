@@ -1,51 +1,54 @@
 
 import Foundation
-import GraphZahl
 import NIO
+import GraphZahl
+import Vapor
+import Cache
+import ContextKit
 
 class Episode: GraphQLObject {
     @Inline
-    var data: EpisodeData
+    var episode: BasicEpisode
 
-    @Ignore
-    var showName: String
+    @LazyInline
+    var details: DetailedEpisode
 
-    @Ignore
-    var showId: Int
-
-    init(data: EpisodeData, showName: String, showId: Int) {
-        self.data = data
-        self.showName = showName
-        self.showId = showId
+    init(episode: BasicEpisode, viewerContext: MovieDB.ViewerContext) {
+        self.episode = episode
+        self._details = LazyInline { viewerContext.episode(showId: episode.showId, seasonNumber: episode.data.seasonNumber, episodeNumber: episode.data.episodeNumber, showName: episode.showName) }
     }
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streampingOptionsForEpisode(showId: showId, showName: showName, seasonNumber: data.seasonNumber, episodeNumber: data.episodeNumber)
+    init(details: DetailedEpisode, viewerContext: MovieDB.ViewerContext) {
+        self.episode = details.episode
+        self._details = LazyInline { viewerContext.request.eventLoop.future(details) }
+    }
+}
+
+extension Episode: Node {
+
+    func id(context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
+        let id = ID(episode.showId, episode.data.seasonNumber, episode.data.episodeNumber, for: .episode)
+        return eventLoop.future(id.string())
     }
 
-    func details(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<DetailedEpisode> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber))).map { data in
-            DetailedEpisode(data: data, showName: self.showName, showId: self.showId)
+    static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<Node?> {
+        let viewerContext = context.anyViewerContext as! MovieDB.ViewerContext
+        guard let newId = ID(id), newId.namespace == .episode, newId.ids.count == 3 else { return eventLoop.future(nil) }
+        return viewerContext
+            .tmdb
+            .show(id: newId.ids[0])
+            .flatMap { viewerContext.episode(showId: newId.ids[0], seasonNumber: newId.ids[1], episodeNumber: newId.ids[2], showName: $0.name) }
+            .map { Episode(details: $0, viewerContext: viewerContext) }
+    }
+
+}
+
+extension MovieDB.ViewerContext {
+
+    func episode(showId: Int, seasonNumber: Int, episodeNumber: Int, showName: String) -> EventLoopFuture<DetailedEpisode> {
+        return tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(seasonNumber)), "episode", .constant(String(episodeNumber))).map { data in
+            DetailedEpisode(data: data, showName: showName, showId: showId)
         }
     }
 
-    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "external_ids")
-    }
-
-    func translations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Translation<TranslatedMovieInfo>]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "translations").map { (wrapper: Translations) in wrapper.translations }
-    }
-
-    func images(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<EpisodeImages> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "images")
-    }
-
-    func videos(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Video]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "videos").map { (wrapper: Videos) in wrapper.results }
-    }
-
-    func credits(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<EpisodeCredits<BasicPerson>> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "credits")
-    }
 }

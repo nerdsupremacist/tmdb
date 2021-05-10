@@ -10,33 +10,34 @@ class Movies: GraphQLObject {
         self.viewerContext = viewerContext
     }
 
-    func search(term: String) -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "search", "movie", query: ["query" : term])
+    func search(term: String) -> EventLoopFuture<Movie.Connection>  {
+        return viewerContext.movies(at: "search", "movie", query: ["query" : term])
     }
 
-    func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "trending", "movie", .constant(timeWindow.rawValue))
+    func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<Movie.Connection> {
+        return viewerContext.movies(at: "trending", "movie", .constant(timeWindow.rawValue))
     }
 
-    func movie(id: ID) -> EventLoopFuture<DetailedMovie> {
+    func movie(id: ID) -> EventLoopFuture<Movie> {
         return id
             .idValue(for: .movie, eventLoop: viewerContext.request.eventLoop)
             .flatMap { self.viewerContext.tmdb.movie(id: $0) }
+            .map { Movie(details: $0, viewerContext: self.viewerContext) }
     }
 
-    func upcoming() -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "movie", "upcoming")
+    func upcoming() -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<Movie>> {
+        return viewerContext.movies(at: "movie", "upcoming")
     }
 
-    func topRated() -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "movie", "top_rated")
+    func topRated() -> EventLoopFuture<Movie.Connection> {
+        return viewerContext.movies(at: "movie", "top_rated")
     }
 
-    func popular() -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "movie", "popular")
+    func popular() -> EventLoopFuture<Movie.Connection> {
+        return viewerContext.movies(at: "movie", "popular")
     }
 
-    func nowPlaying() -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "movie", "now_playing")
+    func nowPlaying() -> EventLoopFuture<Movie.Connection> {
+        return viewerContext.movies(at: "movie", "now_playing")
     }
 }

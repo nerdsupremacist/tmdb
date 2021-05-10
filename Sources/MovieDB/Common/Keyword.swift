@@ -7,8 +7,8 @@ class Keyword: Decodable, GraphQLObject {
     let id: Int
     let name: String
 
-    func movies(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<Movie>> {
-        return viewerContext.tmdb.get(at: "keyword", .constant(String(id)), "movies")
+    func movies(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Movie.Connection> {
+        return viewerContext.movies(at: "keyword", .constant(String(id)), "movies")
     }
 }
 

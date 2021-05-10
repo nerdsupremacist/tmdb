@@ -39,10 +39,39 @@ struct Paging<Node: Decodable & OutputResolvable & ConcreteResolvable>: FixedPag
     }
 }
 
+struct AnyFixedPageSizeIndexedConnection<Node : OutputResolvable & ConcreteResolvable>: FixedPageSizeIndexedConnection {
+    typealias Node = Node
+    typealias Identifier = AnyHashable
+
+    let identifier: AnyHashable
+    let _totalCount: (EventLoopGroup) -> EventLoopFuture<Int>
+    let _pageSize: (EventLoopGroup) -> EventLoopFuture<Int>
+    let _page: (Int, EventLoopGroup) -> EventLoopFuture<[Node?]>
+
+    init<C : FixedPageSizeIndexedConnection>(_ c: C) where C.Node == Node {
+        self.identifier = AnyHashable(c.identifier)
+        _totalCount = { c.totalCount(eventLoop: $0) }
+        _pageSize = { c.pageSize(eventLoop: $0) }
+        _page = { c.page(at: $0, eventLoop: $1) }
+    }
+
+    func totalCount(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return _totalCount(eventLoop)
+    }
+
+    func pageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return _pageSize(eventLoop)
+    }
+
+    func page(at index: Int, eventLoop: EventLoopGroup) -> EventLoopFuture<[Node?]> {
+        return _page(index, eventLoop)
+    }
+}
+
 extension FixedPageSizeIndexedConnection {
 
-    func map<T : OutputResolvable & ConcreteResolvable>(_ transform: @escaping (Node) -> T) -> some FixedPageSizeIndexedConnection {
-        return MappedFixedPageSizeIndexedConnection(prev: self, transform: transform)
+    func map<T : OutputResolvable & ConcreteResolvable>(_ transform: @escaping (Node) -> T) -> AnyFixedPageSizeIndexedConnection<T> {
+        return AnyFixedPageSizeIndexedConnection(MappedFixedPageSizeIndexedConnection(prev: self, transform: transform))
     }
 
 }

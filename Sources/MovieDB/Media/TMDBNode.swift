@@ -15,13 +15,13 @@ protocol TMDBNode: GraphZahl.Node {
 extension TMDBNode {
 
     func id(context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
-        let id = ID(namespace: Self.namespace, id: id)
+        let id = ID(namespace: Self.namespace, ids: [id])
         return eventLoop.future(id.string())
     }
 
     static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<GraphZahl.Node?> {
-        guard let wrapped = ID(id), wrapped.namespace == Self.namespace else { return eventLoop.future(nil) }
-        return find(id: wrapped.id, viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
+        guard let wrapped = ID(id), wrapped.namespace == Self.namespace, wrapped.ids.count == 1 else { return eventLoop.future(nil) }
+        return find(id: wrapped.ids[0], viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
     }
 
 }
@@ -31,13 +31,22 @@ struct ID {
         case movie
         case person
         case show
+        case season
+        case episode
     }
 
-    fileprivate let namespace: Namespace
-    fileprivate let id: Int
+    let namespace: Namespace
+    let ids: [Int]
 
     func string() -> String {
-        return "\(namespace.rawValue):\(id)".data(using: .ascii)!.base64EncodedString()
+        let ids = self.ids.map(String.init).joined(separator: ":")
+        return "\(namespace.rawValue):\(ids)".data(using: .ascii)!.base64EncodedString()
+    }
+}
+
+extension ID {
+    init(_ ids: Int..., for namespace: Namespace) {
+        self.init(namespace: namespace, ids: ids)
     }
 }
 
@@ -48,12 +57,17 @@ extension ID {
 
         let parts = decoded.components(separatedBy: ":").filter { !$0.isEmpty }
 
-        guard parts.count == 2,
+        guard parts.count > 1,
               let namespaceValue = Int(parts[0]),
-              let namespace = Namespace(rawValue: namespaceValue),
-              let id = Int(parts[1]) else { return nil }
+              let namespace = Namespace(rawValue: namespaceValue) else { return nil }
 
-        self.init(namespace: namespace, id: id)
+        var ids = [Int]()
+        for part in parts.dropFirst() {
+            guard let id = Int(part) else { return nil }
+            ids.append(id)
+        }
+
+        self.init(namespace: namespace, ids: ids)
     }
 }
 
@@ -84,14 +98,59 @@ extension ID {
 
     enum Error: Swift.Error {
         case invalidId(desiredNamespace: Namespace)
+        case invalidNumberOfComponents(expected: Int, actual: Int)
     }
 
-    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<[Int]> {
         guard self.namespace == namespace else {
             return eventLoop.future(error: Error.invalidId(desiredNamespace: namespace))
         }
 
-        return eventLoop.future(id)
+        return eventLoop.future(ids)
+    }
+
+    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return eventLoop.tryFuture {
+            guard self.namespace == namespace else {
+                throw Error.invalidId(desiredNamespace: namespace)
+            }
+
+            guard ids.count == 1 else {
+                throw Error.invalidNumberOfComponents(expected: 1, actual: ids.count)
+            }
+
+            return ids[0]
+        }
+    }
+
+    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<(Int, Int)> {
+        return eventLoop.tryFuture {
+
+            guard self.namespace == namespace else {
+                throw Error.invalidId(desiredNamespace: namespace)
+            }
+
+            guard ids.count == 2 else {
+                throw Error.invalidNumberOfComponents(expected: 2, actual: ids.count)
+            }
+
+            return (ids[0], ids[1])
+        }
+    }
+
+    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<(Int, Int, Int)> {
+        return eventLoop.tryFuture {
+
+            guard self.namespace == namespace else {
+                throw Error.invalidId(desiredNamespace: namespace)
+            }
+
+            guard ids.count == 3 else {
+                throw Error.invalidNumberOfComponents(expected: 3, actual: ids.count)
+            }
+
+            return (ids[0], ids[1], ids[2])
+        }
     }
 
 }

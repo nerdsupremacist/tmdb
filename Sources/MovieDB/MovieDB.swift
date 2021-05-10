@@ -38,16 +38,22 @@ enum MovieDB : GraphQLSchema {
             return TV(viewerContext: viewerContext)
         }
 
-        func search(term: String) -> EventLoopFuture<Paging<MovieOrTVOrPeople>> {
-            return viewerContext.tmdb.get(at: "search", "multi", query: ["query" : term])
+        func search(term: String) -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<MovieOrTVOrPeople<OutputTypeNamespace>>> {
+            return viewerContext.tmdb.get(at: "search", "multi", query: ["query" : term]).map { (paging: Paging<MovieOrTVOrPeople<DecodableTypeNamespace>>) in
+                return paging.map { $0.output(viewerContext: self.viewerContext) }
+            }
         }
 
-        func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<Paging<MovieOrTVOrPeople>> {
-            return viewerContext.tmdb.get(at: "trending", "all", .constant(timeWindow.rawValue))
+        func trending(timeWindow: TimeWindow = .day) -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<MovieOrTVOrPeople<OutputTypeNamespace>>> {
+            return viewerContext.tmdb.get(at: "trending", "all", .constant(timeWindow.rawValue)).map { (paging: Paging<MovieOrTVOrPeople<DecodableTypeNamespace>>) in
+                return paging.map { $0.output(viewerContext: self.viewerContext) }
+            }
         }
 
-        func find(externalId: String, source: ExternalSource) -> EventLoopFuture<FromExternalIds> {
-            return viewerContext.tmdb.get(at: "find", .constant(externalId), query: ["external_source" : source.rawValue + "_id"])
+        func find(externalId: String, source: ExternalSource) -> EventLoopFuture<FromExternalIds<OutputTypeNamespace>> {
+            return viewerContext.tmdb.get(at: "find", .constant(externalId), query: ["external_source" : source.rawValue + "_id"]).map { (ids: FromExternalIds<DecodableTypeNamespace>) in
+                return ids.output(viewerContext: self.viewerContext)
+            }
         }
 
         required init(viewerContext: ViewerContext) {

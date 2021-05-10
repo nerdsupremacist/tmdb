@@ -3,7 +3,7 @@ import Foundation
 import GraphZahl
 import NIO
 
-class DetailedMovie: Movie {
+class DetailedMovie: BasicMovie {
     private enum CodingKeys: String, CodingKey {
         case budget, genres, homepage
         case imdbID = "imdb_id"

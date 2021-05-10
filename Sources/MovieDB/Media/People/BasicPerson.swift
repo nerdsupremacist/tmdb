@@ -5,7 +5,10 @@ import NIO
 
 class BasicPerson: Decodable, GraphQLObject {
     let profilePicture: Image<ProfileSize>?
-    let id: Int
+
+    @Ignore
+    var id: Int
+
     let name: String
 
     private enum CodingKeys: String, CodingKey {
@@ -15,10 +18,6 @@ class BasicPerson: Decodable, GraphQLObject {
 
     var credits: PersonCredits {
         return PersonCredits(id: id)
-    }
-
-    func details(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<DetailedPerson> {
-        return viewerContext.tmdb.get(at: "person", .constant(String(id)))
     }
 
     func images(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[DetailImage<ProfileSize>]> {
@@ -33,23 +32,9 @@ class BasicPerson: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "person", .constant(String(id)), "translations").map { (wrapper: Translations) in wrapper.translations }
     }
 
-    func taggedImages(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Paging<TaggedImage>> {
-        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "tagged_images")
+    func taggedImages(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<TaggedImage<OutputTypeNamespace>>> {
+        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "tagged_images").map { (images: Paging<TaggedImage<DecodableTypeNamespace>>) in
+            return images.map { $0.output(viewerContext: viewerContext) }
+        }
     }
-}
-
-extension BasicPerson: TMDBNode {
-    static let namespace: ID.Namespace = .person
-
-    static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
-        return viewerContext.tmdb.person(id: id).map { $0 }
-    }
-}
-
-extension Client {
-
-    func person(id: Int) -> EventLoopFuture<DetailedPerson> {
-        return get(at: "person", .constant(String(id)))
-    }
-
 }

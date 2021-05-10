@@ -102,7 +102,11 @@ class Client {
         return get(at: path, query: query, expiry: expiry, type: type)
     }
 
-    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .minutes(30)) -> EventLoopFuture<Paging<T>> {
+    func get<T: Decodable>(at path: PathComponent..., query: [String : String] = [:], expiry: Expiry = .minutes(30), type: Paging<T>.Type = Paging<T>.self) -> EventLoopFuture<Paging<T>> {
+        return get(at: path, query: query, expiry: expiry, type: type)
+    }
+
+    func get<T: Decodable>(at path: [PathComponent], query: [String : String] = [:], expiry: Expiry = .minutes(30), type: Paging<T>.Type = Paging<T>.self) -> EventLoopFuture<Paging<T>> {
         return get(at: path, query: query, expiry: expiry, type: Page<T>.self).map { page in
             return Paging(client: self, first: page, path: path, query: query)
         }

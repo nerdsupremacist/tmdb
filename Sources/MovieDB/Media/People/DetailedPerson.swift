@@ -1,7 +1,7 @@
 
 import Foundation
 
-class DetailedPerson: Person {
+class DetailedPerson: MediumPerson {
     let birthday: Date?
     let knownForDepartment: String
     let deathday: Date?
