@@ -24,7 +24,7 @@ class TVShow: GraphQLObject, Node {
 }
 
 extension TVShow: TMDBNode {
-    static let namespace: ID.Namespace = .movie
+    static let namespace: ID.Namespace = .show
 
     var id: Int {
         return show.id
