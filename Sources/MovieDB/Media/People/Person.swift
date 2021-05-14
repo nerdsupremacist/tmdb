@@ -65,7 +65,7 @@ extension Person: TMDBNode {
     }
 
     static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
-        return viewerContext.tmdb.movie(id: id).map { Movie(details: $0, viewerContext: viewerContext) }
+        return viewerContext.tmdb.person(id: id).map { Person(details: $0, viewerContext: viewerContext) }
     }
 }
 
