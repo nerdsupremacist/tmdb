@@ -85,6 +85,18 @@ class DetailedTVShow: BasicTVShow {
             .map { Season(season: $0.season, viewerContext: viewerContext) }
     }
 
+    func episodes(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Episode]> {
+        return internalSeasons
+            .map { viewerContext.season(showId: id, seasonNumber: $0.data.seasonNumber, showName: name) }
+            .flatten(on: viewerContext.request.eventLoop.next())
+            .map { $0.flatMap { $0.episodes(viewerContext: viewerContext) } }
+    }
+
+    func topRatedEpisode(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Episode?> {
+        return episodes(viewerContext: viewerContext)
+            .map { $0.max { $0.episode.data.voteAverage < $1.episode.data.voteAverage } }
+    }
+
     func createdBy(viewerContext: MovieDB.ViewerContext) -> [BaseCredit<Person>] {
         return internalCreatedBy.map { $0.map { Person(person: $0, viewerContext: viewerContext) } }
     }
