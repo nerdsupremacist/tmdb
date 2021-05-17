@@ -12,7 +12,7 @@ class BasicTVShow: Decodable, GraphQLObject {
     let backdrop: Image<BackdropSize>?
     let rating: Double
     let overview: String
-    let firstAirDate: OptionalDate
+    let firstAirDate: OptionalDate?
     let originCountry: [String]
     let originalLanguage: String
     let numberOfRatings: Int
