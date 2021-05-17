@@ -93,8 +93,14 @@ class DetailedTVShow: BasicTVShow {
     }
 
     func topRatedEpisode(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Episode?> {
+        let now = Date()
         return episodes(viewerContext: viewerContext)
-            .map { $0.max { $0.episode.data.voteAverage < $1.episode.data.voteAverage } }
+            .map { episodes in
+                episodes
+                    .filter { $0.episode.data.airDate?.wrappedValue.map { $0 < now } ?? false }
+                    .filter { $0.episode.data.voteAverage > 0 }
+                    .max { $0.episode.data.voteAverage < $1.episode.data.voteAverage }
+            }
     }
 
     func createdBy(viewerContext: MovieDB.ViewerContext) -> [BaseCredit<Person>] {
