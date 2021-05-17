@@ -90,6 +90,18 @@ class DetailedTVShow: BasicTVShow {
             .map { viewerContext.season(showId: id, seasonNumber: $0.data.seasonNumber, showName: name) }
             .flatten(on: viewerContext.request.eventLoop.next())
             .map { $0.flatMap { $0.episodes(viewerContext: viewerContext) } }
+            .map { episodes in
+                episodes.sorted { lhs, rhs in
+                    switch (lhs.episode.data.airDate?.wrappedValue, rhs.episode.data.airDate?.wrappedValue) {
+                    case (.some(let lhs), .some(let rhs)):
+                        return lhs < rhs
+                    case (.some, .none):
+                        return true
+                    default:
+                        return false
+                    }
+                }
+            }
     }
 
     func topRatedEpisode(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Episode?> {

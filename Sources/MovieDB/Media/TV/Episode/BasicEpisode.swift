@@ -27,6 +27,30 @@ class BasicEpisode: GraphQLObject {
         return viewerContext.season(showId: showId, seasonNumber: data.seasonNumber, showName: showName).map { Season(details: $0, viewerContext: viewerContext) }
     }
 
+    func previous(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Episode?> {
+        return show(viewerContext: viewerContext)
+            .flatMap { ($0.show as! DetailedTVShow).episodes(viewerContext: viewerContext) }
+            .map { $0.filter { $0.episode.data.seasonNumber != 0 } }
+            .map { episodes in
+                guard let indexOfSelf = episodes.firstIndex(where: { $0.episode.data.id == self.data.id }) else { return nil }
+                let index = episodes.index(before: indexOfSelf)
+                guard episodes.indices.contains(index) else { return nil }
+                return episodes[index]
+            }
+    }
+
+    func next(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<Episode?> {
+        return show(viewerContext: viewerContext)
+            .flatMap { ($0.show as! DetailedTVShow).episodes(viewerContext: viewerContext) }
+            .map { $0.filter { $0.episode.data.seasonNumber != 0 } }
+            .map { episodes in
+                guard let indexOfSelf = episodes.firstIndex(where: { $0.episode.data.id == self.data.id }) else { return nil }
+                let index = episodes.index(after: indexOfSelf)
+                guard episodes.indices.contains(index) else { return nil }
+                return episodes[index]
+            }
+    }
+
     func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
         return viewerContext.streampingOptionsForEpisode(showId: showId, showName: showName, seasonNumber: data.seasonNumber, episodeNumber: data.episodeNumber)
     }
