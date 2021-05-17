@@ -72,7 +72,17 @@ class DetailedTVShow: BasicTVShow {
     }
 
     func seasons(viewerContext: MovieDB.ViewerContext) -> [Season] {
-        return internalSeasons.map { Season(season: $0.season, viewerContext: viewerContext) }
+        return internalSeasons
+            .sorted { lhs, rhs in
+                if (lhs.data.seasonNumber == 0) {
+                    return false
+                }
+                if (rhs.data.seasonNumber == 0) {
+                    return true
+                }
+                return lhs.data.seasonNumber < rhs.data.seasonNumber
+            }
+            .map { Season(season: $0.season, viewerContext: viewerContext) }
     }
 
     func createdBy(viewerContext: MovieDB.ViewerContext) -> [BaseCredit<Person>] {
