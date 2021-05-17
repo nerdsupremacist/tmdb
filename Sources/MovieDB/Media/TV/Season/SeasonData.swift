@@ -5,7 +5,7 @@ import ContextKit
 import NIO
 
 class SeasonData: Decodable, GraphQLObject {
-    let airDate: Date?
+    let airDate: OptionalDate?
     let id: Int
     let name: String
     let overview: String?
