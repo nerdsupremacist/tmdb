@@ -24,8 +24,8 @@ class BasicPerson: Decodable, GraphQLObject {
         return viewerContext.tmdb.get(at: "person", .constant(String(id)), "images").map { (wrapper: PersonImages) in wrapper.profiles }
     }
 
-    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
-        return viewerContext.tmdb.get(at: "person", .constant(String(id)), "external_ids")
+    func externalIds(viewerContext: MovieDB.ViewerContext) -> FullExternalIDS {
+        return .person(id: id, viewerContext: viewerContext)
     }
 
     func translations(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Translation<TranslatedPersonInfo>]> {

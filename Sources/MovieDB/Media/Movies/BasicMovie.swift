@@ -37,8 +37,8 @@ class BasicMovie: Decodable, GraphQLObject {
         return viewerContext.streamingOptions(id: id, name: title, contentType: .movie)
     }
 
-    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
-        return viewerContext.tmdb.get(at: "movie", .constant(String(id)), "external_ids")
+    func externalIds(viewerContext: MovieDB.ViewerContext) -> FullExternalIDS {
+        return .movie(id: id, viewerContext: viewerContext)
     }
 
     func alternativeTitles(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[AlternativeTitle]> {

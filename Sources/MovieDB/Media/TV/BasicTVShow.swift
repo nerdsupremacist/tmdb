@@ -43,8 +43,8 @@ class BasicTVShow: Decodable, GraphQLObject {
             .map { Season(details: $0, viewerContext: viewerContext) }
     }
 
-    func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "external_ids")
+    func externalIds(viewerContext: MovieDB.ViewerContext) -> FullExternalIDS {
+        return .show(id: id, viewerContext: viewerContext)
     }
 
     func alternativeTitles(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[AlternativeTitle]> {
