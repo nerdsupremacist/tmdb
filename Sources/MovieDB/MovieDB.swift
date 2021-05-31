@@ -38,6 +38,10 @@ enum MovieDB : GraphQLSchema {
             return TV(viewerContext: viewerContext)
         }
 
+        var genres: Genres {
+            return Genres(viewerContext: viewerContext)
+        }
+
         func search(term: String) -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<MovieOrTVOrPeople<OutputTypeNamespace>>> {
             return viewerContext.tmdb.get(at: "search", "multi", query: ["query" : term]).map { (paging: Paging<MovieOrTVOrPeople<DecodableTypeNamespace>>) in
                 return paging.map { $0.output(viewerContext: self.viewerContext) }

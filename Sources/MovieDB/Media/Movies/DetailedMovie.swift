@@ -53,13 +53,10 @@ class DetailedMovie: BasicMovie {
     }
 }
 
-class Genre: Codable, GraphQLObject {
-    let id: Int
-    let name: String
-}
-
 class ProductionCompany: Decodable, GraphQLObject {
-    let id: Int
+    @Ignore
+    var id: Int
+
     let logo: Image<LogoSize>?
     let name, originCountry: String
 
@@ -69,6 +66,30 @@ class ProductionCompany: Decodable, GraphQLObject {
         case name
         case originCountry = "origin_country"
     }
+
+    var movies: NestedMovies {
+        return .productionCompany(id: id)
+    }
+
+    var tv: NestedTV {
+        return .productionCompany(id: id)
+    }
+}
+
+extension ProductionCompany: TMDBNode {
+    static let namespace: ID.Namespace = .productionCompany
+
+    static func find(id: Int, viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TMDBNode> {
+        return viewerContext.tmdb.productionCompany(id: id).map { $0 }
+    }
+}
+
+extension Client {
+
+    func productionCompany(id: Int) -> EventLoopFuture<ProductionCompany> {
+        return get(at: "company", .constant(String(id)))
+    }
+
 }
 
 class ProductionCountry: Codable, GraphQLObject {

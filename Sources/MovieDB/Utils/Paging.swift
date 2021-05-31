@@ -44,15 +44,21 @@ struct AnyFixedPageSizeIndexedConnection<Node : OutputResolvable & ConcreteResol
     typealias Identifier = AnyHashable
 
     let identifier: AnyHashable
+    let _defaultPageSize: (EventLoopGroup) -> EventLoopFuture<Int?>
     let _totalCount: (EventLoopGroup) -> EventLoopFuture<Int>
     let _pageSize: (EventLoopGroup) -> EventLoopFuture<Int>
     let _page: (Int, EventLoopGroup) -> EventLoopFuture<[Node?]>
 
     init<C : FixedPageSizeIndexedConnection>(_ c: C) where C.Node == Node {
         self.identifier = AnyHashable(c.identifier)
+        _defaultPageSize = { c.defaultPageSize(eventLoop: $0) }
         _totalCount = { c.totalCount(eventLoop: $0) }
         _pageSize = { c.pageSize(eventLoop: $0) }
         _page = { c.page(at: $0, eventLoop: $1) }
+    }
+
+    func defaultPageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int?> {
+        return _defaultPageSize(eventLoop)
     }
 
     func totalCount(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
@@ -87,6 +93,10 @@ struct MappedFixedPageSizeIndexedConnection<
         return prev.identifier
     }
 
+    func defaultPageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int?> {
+        return prev.defaultPageSize(eventLoop: eventLoop)
+    }
+
     func totalCount(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
         return prev.totalCount(eventLoop: eventLoop)
     }
@@ -110,4 +120,35 @@ struct Page<T: Decodable>: Decodable {
     let results: [T]
     let page, totalResults: Int
     let totalPages: Int
+}
+
+struct CollectionConnection<T : Collection, ID: Hashable>: FixedPageSizeIndexedConnection where T.Element: OutputResolvable & ConcreteResolvable {
+    typealias Node = T.Element
+
+    let collection: T
+    let identifier: ID
+
+    func defaultPageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int?> {
+        return eventLoop.future(min(20, collection.count))
+    }
+
+    func totalCount(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return eventLoop.future(collection.count)
+    }
+
+    func pageSize(eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return eventLoop.future(collection.count)
+    }
+
+    func page(at index: Int, eventLoop: EventLoopGroup) -> EventLoopFuture<[Node?]> {
+        return eventLoop.future(collection.map { $0 })
+    }
+}
+
+extension Collection where Element: OutputResolvable & ConcreteResolvable {
+
+    func asConnection<ID : Hashable>(with id: ID) -> AnyFixedPageSizeIndexedConnection<Element> {
+        return AnyFixedPageSizeIndexedConnection(CollectionConnection(collection: self, identifier: id))
+    }
+
 }

@@ -32,6 +32,13 @@ class TV: GraphQLObject {
             }
     }
 
+    func network(id: ID) -> EventLoopFuture<Network> {
+        return id.idValue(for: .network, eventLoop: viewerContext.request.eventLoop)
+            .flatMap { id in
+                return self.viewerContext.tmdb.network(id: id)
+            }
+    }
+
     func episode(id: ID) -> EventLoopFuture<Episode> {
         return id.idValue(for: .episode, eventLoop: viewerContext.request.eventLoop)
             .flatMap { (showId, seasonNumber, episodeNumber) -> EventLoopFuture<DetailedEpisode> in

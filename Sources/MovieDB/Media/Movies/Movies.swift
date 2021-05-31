@@ -25,6 +25,14 @@ class Movies: GraphQLObject {
             .map { Movie(details: $0, viewerContext: self.viewerContext) }
     }
 
+    func productionCompany(id: ID) -> EventLoopFuture<ProductionCompany> {
+        return id
+            .idValue(for: .productionCompany, eventLoop: viewerContext.request.eventLoop)
+            .flatMap { id in
+                return self.viewerContext.tmdb.productionCompany(id: id)
+            }
+    }
+
     func upcoming() -> EventLoopFuture<AnyFixedPageSizeIndexedConnection<Movie>> {
         return viewerContext.movies(at: "movie", "upcoming")
     }

@@ -60,7 +60,7 @@ class BasicTVShow: Decodable, GraphQLObject {
     }
 
     func keywords(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Keyword]> {
-        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "keywords").map { (wrapper: Keywords) in wrapper.keywords }
+        return viewerContext.tmdb.get(at: "tv", .constant(String(id)), "keywords").map { (wrapper: TVShowKeywords) in wrapper.results }
     }
 
     func videos(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[Video]> {
@@ -84,4 +84,8 @@ class BasicTVShow: Decodable, GraphQLObject {
     func similar(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<TVShow.Connection> {
         return viewerContext.shows(at: "tv", .constant(String(id)), "similar")
     }
+}
+
+private struct TVShowKeywords: Decodable {
+    let results: [Keyword]
 }

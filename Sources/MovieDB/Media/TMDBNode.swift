@@ -33,6 +33,11 @@ struct ID {
         case show
         case season
         case episode
+
+        case genre
+        case keyword
+        case productionCompany
+        case network
     }
 
     let namespace: Namespace
