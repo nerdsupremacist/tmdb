@@ -33,6 +33,17 @@ class BasicSeason: GraphQLObject {
         }
     }
 
+    func searchStreamingOptions(viewerContext: MovieDB.ViewerContext,
+                                providers: [ID],
+                                countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
+
+        return viewerContext.searchStreampingOptionsForSeason(showId: self.showId,
+                                                              showName: self.showName,
+                                                              seasonNumber: self.data.seasonNumber,
+                                                              providers: providers,
+                                                              countries: countries)
+    }
+
     func episode(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<Episode> {
         return viewerContext.episode(showId: showId, seasonNumber: data.seasonNumber, episodeNumber: number, showName: showName).map { details in
             Episode(details: details, viewerContext: viewerContext)

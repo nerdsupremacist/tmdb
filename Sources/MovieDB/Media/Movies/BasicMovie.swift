@@ -44,6 +44,13 @@ class BasicMovie: Decodable, GraphQLObject {
         }
     }
 
+    func searchStreamingOptions(viewerContext: MovieDB.ViewerContext,
+                                providers: [ID],
+                                countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
+
+        return viewerContext.searchStreamingOptions(id: self.id, name: self.title, contentType: .movie, providers: providers, countries: countries)
+    }
+
     func externalIds(viewerContext: MovieDB.ViewerContext) -> FullExternalIDS {
         return .movie(id: id, viewerContext: viewerContext)
     }

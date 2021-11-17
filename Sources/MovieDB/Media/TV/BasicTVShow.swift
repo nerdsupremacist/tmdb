@@ -43,6 +43,13 @@ class BasicTVShow: Decodable, GraphQLObject {
         }
     }
 
+    func searchStreamingOptions(viewerContext: MovieDB.ViewerContext,
+                                providers: [ID],
+                                countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
+
+        return viewerContext.searchStreamingOptions(id: self.id, name: self.name, contentType: .show, providers: providers, countries: countries)
+    }
+
     func season(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<Season> {
         return viewerContext
             .season(showId: id, seasonNumber: number, showName: name)
