@@ -9,8 +9,12 @@ extension MovieDB.ViewerContext {
         case show
     }
 
-    func streamingOptions(id: Int, name: String, contentType: ContentType) -> EventLoopFuture<[StreamingOption]?> {
-        return justWatchItem(id: id, name: name, contentType: contentType)
+    func countries() -> EventLoopFuture<[StreamingCountry]> {
+        return justWatch.get(at: ["locales", "state"])
+    }
+
+    func streamingOptions(id: Int, name: String, contentType: ContentType, locale: String?) -> EventLoopFuture<[StreamingOption]?> {
+        return justWatchItem(id: id, name: name, contentType: contentType, locale: locale)
             .map { item in
                 guard let offers = item?.offers else { return nil }
                 let groupped = Dictionary(grouping: offers, by: { $0.providerID })
@@ -21,16 +25,16 @@ extension MovieDB.ViewerContext {
             }
     }
 
-    func streamingProviders() -> EventLoopFuture<[StreamingProvider]?> {
-        return locale()
+    func streamingProviders(locale: String?) -> EventLoopFuture<[StreamingProvider]?> {
+        return self.locale(locale: locale)
             .flatMap { locale -> EventLoopFuture<[StreamingProvider]?> in
                 guard let locale = locale else { return self.request.eventLoop.future(nil) }
                 return self.justWatch.get(at: "providers", "locale", .constant(locale), expiry: .pseudoDays(3))
             }
     }
 
-    func streampingOptionsForSeason(showId: Int, showName: String, seasonNumber: Int) -> EventLoopFuture<[StreamingOption]?> {
-        return justWatchSeason(showId: showId, showName: showName, seasonNumber: seasonNumber).map { season in
+    func streampingOptionsForSeason(showId: Int, showName: String, seasonNumber: Int, locale: String?) -> EventLoopFuture<[StreamingOption]?> {
+        return justWatchSeason(showId: showId, showName: showName, seasonNumber: seasonNumber, locale: locale).map { season in
             guard let offers = season?.offers else { return nil }
             let groupped = Dictionary(grouping: offers, by: { $0.providerID })
             return groupped
@@ -40,8 +44,8 @@ extension MovieDB.ViewerContext {
         }
     }
 
-    func streampingOptionsForEpisode(showId: Int, showName: String, seasonNumber: Int, episodeNumber: Int) -> EventLoopFuture<[StreamingOption]?> {
-        return justWatchSeason(showId: showId, showName: showName, seasonNumber: seasonNumber).map { season in
+    func streampingOptionsForEpisode(showId: Int, showName: String, seasonNumber: Int, episodeNumber: Int, locale: String?) -> EventLoopFuture<[StreamingOption]?> {
+        return justWatchSeason(showId: showId, showName: showName, seasonNumber: seasonNumber, locale: locale).map { season in
             guard let offers = season?.episodes?.first(where: { $0.number == episodeNumber })?.offers else { return nil }
             let groupped = Dictionary(grouping: offers, by: { $0.providerID })
             return groupped
@@ -55,9 +59,9 @@ extension MovieDB.ViewerContext {
 
 extension MovieDB.ViewerContext {
 
-    private func justWatchSeason(showId: Int, showName: String, seasonNumber: Int) -> EventLoopFuture<JustWatchSeasonDetails?> {
-        let showId = justWatchItem(id: showId, name: showName, contentType: .show).map { $0?.id }
-        let locale = self.locale()
+    private func justWatchSeason(showId: Int, showName: String, seasonNumber: Int, locale: String?) -> EventLoopFuture<JustWatchSeasonDetails?> {
+        let showId = justWatchItem(id: showId, name: showName, contentType: .show, locale: locale).map { $0?.id }
+        let locale = self.locale(locale: locale)
         return showId
             .and(locale)
             .flatMap { (showId, locale) -> EventLoopFuture<JustWatchShowDetails?> in
@@ -72,8 +76,8 @@ extension MovieDB.ViewerContext {
             }
     }
 
-    private func justWatchItem(id: Int, name: String, contentType: ContentType) -> EventLoopFuture<JustWatchItem?> {
-        return locale()
+    private func justWatchItem(id: Int, name: String, contentType: ContentType, locale: String?) -> EventLoopFuture<JustWatchItem?> {
+        return self.locale(locale: locale)
             .flatMap { locale -> EventLoopFuture<JustWatchResponse?> in
                 guard let locale = locale else { return self.request.eventLoop.future(nil) }
                 let body: JSON = .dictionary([

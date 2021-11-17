@@ -15,13 +15,14 @@ protocol TMDBNode: GraphZahl.Node {
 extension TMDBNode {
 
     func id(context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
-        let id = ID(namespace: Self.namespace, ids: [self.id])
+        let id = ID(namespace: Self.namespace, ids: [String(self.id)])
         return eventLoop.future(id.string())
     }
 
     static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<GraphZahl.Node?> {
         guard let wrapped = ID(id), wrapped.namespace == Self.namespace, wrapped.ids.count == 1 else { return eventLoop.future(nil) }
-        return find(id: wrapped.ids[0], viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
+        let ids = wrapped.intIds()
+        return find(id: ids[0], viewerContext: context.anyViewerContext as! MovieDB.ViewerContext).map { $0 }
     }
 
 }
@@ -38,20 +39,27 @@ struct ID {
         case keyword
         case productionCompany
         case network
+
+        case stremingProvider
+        case streamingCountry
     }
 
     let namespace: Namespace
-    let ids: [Int]
+    let ids: [String]
 
     func string() -> String {
-        let ids = self.ids.map(String.init).joined(separator: ":")
+        let ids = self.ids.joined(separator: ":")
         return "\(namespace.rawValue):\(ids)".data(using: .ascii)!.base64EncodedString()
+    }
+
+    func intIds() -> [Int] {
+        return ids.compactMap(Int.init)
     }
 }
 
 extension ID {
     init(_ ids: Int..., for namespace: Namespace) {
-        self.init(namespace: namespace, ids: ids)
+        self.init(namespace: namespace, ids: ids.map(String.init))
     }
 }
 
@@ -66,13 +74,7 @@ extension ID {
               let namespaceValue = Int(parts[0]),
               let namespace = Namespace(rawValue: namespaceValue) else { return nil }
 
-        var ids = [Int]()
-        for part in parts.dropFirst() {
-            guard let id = Int(part) else { return nil }
-            ids.append(id)
-        }
-
-        self.init(namespace: namespace, ids: ids)
+        self.init(namespace: namespace, ids: Array(parts.dropFirst()))
     }
 }
 
@@ -111,10 +113,27 @@ extension ID {
             return eventLoop.future(error: Error.invalidId(desiredNamespace: namespace))
         }
 
+        let ids = intIds()
+
         return eventLoop.future(ids)
     }
 
     func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<Int> {
+        return eventLoop.tryFuture {
+            guard self.namespace == namespace else {
+                throw Error.invalidId(desiredNamespace: namespace)
+            }
+            let ids = intIds()
+
+            guard ids.count == 1 else {
+                throw Error.invalidNumberOfComponents(expected: 1, actual: ids.count)
+            }
+
+            return ids[0]
+        }
+    }
+
+    func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
         return eventLoop.tryFuture {
             guard self.namespace == namespace else {
                 throw Error.invalidId(desiredNamespace: namespace)
@@ -130,10 +149,10 @@ extension ID {
 
     func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<(Int, Int)> {
         return eventLoop.tryFuture {
-
             guard self.namespace == namespace else {
                 throw Error.invalidId(desiredNamespace: namespace)
             }
+            let ids = intIds()
 
             guard ids.count == 2 else {
                 throw Error.invalidNumberOfComponents(expected: 2, actual: ids.count)
@@ -145,10 +164,10 @@ extension ID {
 
     func idValue(for namespace: Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<(Int, Int, Int)> {
         return eventLoop.tryFuture {
-
             guard self.namespace == namespace else {
                 throw Error.invalidId(desiredNamespace: namespace)
             }
+            let ids = intIds()
 
             guard ids.count == 3 else {
                 throw Error.invalidNumberOfComponents(expected: 3, actual: ids.count)
@@ -157,5 +176,4 @@ extension ID {
             return (ids[0], ids[1], ids[2])
         }
     }
-
 }

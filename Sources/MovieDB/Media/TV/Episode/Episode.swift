@@ -33,11 +33,13 @@ extension Episode: Node {
 
     static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<Node?> {
         let viewerContext = context.anyViewerContext as! MovieDB.ViewerContext
-        guard let newId = ID(id), newId.namespace == .episode, newId.ids.count == 3 else { return eventLoop.future(nil) }
+        guard let newId = ID(id), newId.namespace == .episode else { return eventLoop.future(nil) }
+        let ids = newId.intIds()
+        guard newId.ids.count == 3 else { return eventLoop.future(nil) }
         return viewerContext
             .tmdb
-            .show(id: newId.ids[0])
-            .flatMap { viewerContext.episode(showId: newId.ids[0], seasonNumber: newId.ids[1], episodeNumber: newId.ids[2], showName: $0.name) }
+            .show(id: ids[0])
+            .flatMap { viewerContext.episode(showId: ids[0], seasonNumber: ids[1], episodeNumber: ids[2], showName: $0.name) }
             .map { Episode(details: $0, viewerContext: viewerContext) }
     }
 

@@ -51,8 +51,18 @@ class BasicEpisode: GraphQLObject {
             }
     }
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streampingOptionsForEpisode(showId: showId, showName: showName, seasonNumber: data.seasonNumber, episodeNumber: data.episodeNumber)
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, country: ID?) -> EventLoopFuture<[StreamingOption]?> {
+        let locale: EventLoopFuture<String?> = country?
+            .idValue(for: .streamingCountry, eventLoop: viewerContext.request.eventLoop)
+            .map(Optional.some) ?? viewerContext.request.eventLoop.future(nil)
+
+        return locale.flatMap { locale in
+            return viewerContext.streampingOptionsForEpisode(showId: self.showId,
+                                                             showName: self.showName,
+                                                             seasonNumber: self.data.seasonNumber,
+                                                             episodeNumber: self.data.episodeNumber,
+                                                             locale: locale)
+        }
     }
 
     func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {

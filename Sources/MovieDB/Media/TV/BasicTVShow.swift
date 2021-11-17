@@ -33,8 +33,14 @@ class BasicTVShow: Decodable, GraphQLObject {
         case originalName = "original_name"
     }
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streamingOptions(id: id, name: name, contentType: .show)
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, country: ID?) -> EventLoopFuture<[StreamingOption]?> {
+        let locale: EventLoopFuture<String?> = country?
+            .idValue(for: .streamingCountry, eventLoop: viewerContext.request.eventLoop)
+            .map(Optional.some) ?? viewerContext.request.eventLoop.future(nil)
+
+        return locale.flatMap { locale in
+            return viewerContext.streamingOptions(id: self.id, name: self.name, contentType: .show, locale: locale)
+        }
     }
 
     func season(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<Season> {

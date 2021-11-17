@@ -23,8 +23,14 @@ class BasicSeason: GraphQLObject {
         return viewerContext.tmdb.show(id: showId).map { TVShow(details: $0, viewerContext: viewerContext) }
     }
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streampingOptionsForSeason(showId: showId, showName: showName, seasonNumber: data.seasonNumber)
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, country: ID?) -> EventLoopFuture<[StreamingOption]?> {
+        let locale: EventLoopFuture<String?> = country?
+            .idValue(for: .streamingCountry, eventLoop: viewerContext.request.eventLoop)
+            .map(Optional.some) ?? viewerContext.request.eventLoop.future(nil)
+
+        return locale.flatMap { locale in
+            return viewerContext.streampingOptionsForSeason(showId: self.showId, showName: self.showName, seasonNumber: self.data.seasonNumber, locale: locale)
+        }
     }
 
     func episode(viewerContext: MovieDB.ViewerContext, number: Int) -> EventLoopFuture<Episode> {

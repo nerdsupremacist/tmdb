@@ -2,6 +2,7 @@
 import Foundation
 import GraphZahl
 import NIO
+import CloudKit
 
 // MARK: - MovieBase
 class BasicMovie: Decodable, GraphQLObject {
@@ -33,8 +34,14 @@ class BasicMovie: Decodable, GraphQLObject {
     let isVideo: Bool
     let rating: Double
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<[StreamingOption]?> {
-        return viewerContext.streamingOptions(id: id, name: title, contentType: .movie)
+    func streamingOptions(viewerContext: MovieDB.ViewerContext, country: ID?) -> EventLoopFuture<[StreamingOption]?> {
+        let locale: EventLoopFuture<String?> = country?
+            .idValue(for: .streamingCountry, eventLoop: viewerContext.request.eventLoop)
+            .map(Optional.some) ?? viewerContext.request.eventLoop.future(nil)
+
+        return locale.flatMap { locale in
+            return viewerContext.streamingOptions(id: self.id, name: self.title, contentType: .movie, locale: locale)
+        }
     }
 
     func externalIds(viewerContext: MovieDB.ViewerContext) -> FullExternalIDS {
