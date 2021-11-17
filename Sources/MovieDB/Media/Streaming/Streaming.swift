@@ -10,6 +10,13 @@ class Streaming: GraphQLObject {
         self.viewerContext = viewerContext
     }
 
+    func myCountry() -> EventLoopFuture<StreamingCountry?> {
+        return viewerContext.locale(locale: nil).flatMap { locale in
+            guard let locale = locale?.lowercased() else { return self.viewerContext.request.eventLoop.future(nil) }
+            return self.viewerContext.countries().map { $0.first { $0.locale.lowercased() == locale } }
+        }
+    }
+
     func countries() -> EventLoopFuture<[StreamingCountry]> {
         return viewerContext.countries()
     }
