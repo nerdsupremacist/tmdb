@@ -2,7 +2,6 @@
 import Foundation
 import GraphZahl
 import NIO
-import CloudKit
 
 class StreamingProvider: Decodable, GraphQLObject {
     @Ignore

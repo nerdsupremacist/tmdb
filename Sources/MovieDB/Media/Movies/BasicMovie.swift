@@ -2,7 +2,6 @@
 import Foundation
 import GraphZahl
 import NIO
-import CloudKit
 
 // MARK: - MovieBase
 class BasicMovie: Decodable, GraphQLObject {
