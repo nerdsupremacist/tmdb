@@ -13,14 +13,27 @@ class Episode: GraphQLObject {
     @LazyInline
     var details: DetailedEpisode
 
+    @InlineAsInterface
+    var streamable: Streamable
+
     init(episode: BasicEpisode, viewerContext: MovieDB.ViewerContext) {
         self.episode = episode
         self._details = LazyInline { viewerContext.episode(showId: episode.showId, seasonNumber: episode.data.seasonNumber, episodeNumber: episode.data.episodeNumber, showName: episode.showName) }
+        self.streamable = Streamable { $0.streampingOptionsForEpisode(showId: episode.showId,
+                                                                      showName: episode.showName,
+                                                                      seasonNumber: episode.data.seasonNumber,
+                                                                      episodeNumber: episode.data.episodeNumber,
+                                                                      locale: $1) }
     }
 
     init(details: DetailedEpisode, viewerContext: MovieDB.ViewerContext) {
         self.episode = details.episode
         self._details = LazyInline { viewerContext.request.eventLoop.future(details) }
+        self.streamable = Streamable { $0.streampingOptionsForEpisode(showId: details.episode.showId,
+                                                                      showName: details.episode.showName,
+                                                                      seasonNumber: details.episode.data.seasonNumber,
+                                                                      episodeNumber: details.episode.data.episodeNumber,
+                                                                      locale: $1) }
     }
 }
 

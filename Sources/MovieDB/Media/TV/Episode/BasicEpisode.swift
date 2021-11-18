@@ -51,32 +51,6 @@ class BasicEpisode: GraphQLObject {
             }
     }
 
-    func streamingOptions(viewerContext: MovieDB.ViewerContext, country: ID?) -> EventLoopFuture<[StreamingOption]?> {
-        let locale: EventLoopFuture<String?> = country?
-            .idValue(for: .streamingCountry, eventLoop: viewerContext.request.eventLoop)
-            .map(Optional.some) ?? viewerContext.request.eventLoop.future(nil)
-
-        return locale.flatMap { locale in
-            return viewerContext.streampingOptionsForEpisode(showId: self.showId,
-                                                             showName: self.showName,
-                                                             seasonNumber: self.data.seasonNumber,
-                                                             episodeNumber: self.data.episodeNumber,
-                                                             locale: locale)
-        }
-    }
-
-    func searchStreamingOptions(viewerContext: MovieDB.ViewerContext,
-                                providers: [ID],
-                                countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
-
-        return viewerContext.searchStreampingOptionsForEpisode(showId: self.showId,
-                                                               showName: self.showName,
-                                                               seasonNumber: self.data.seasonNumber,
-                                                               episodeNumber: self.data.episodeNumber,
-                                                               providers: providers,
-                                                               countries: countries)
-    }
-
     func externalIds(viewerContext: MovieDB.ViewerContext) -> EventLoopFuture<ExternalIDS> {
         return viewerContext.tmdb.get(at: "tv", .constant(String(showId)), "season", .constant(String(data.seasonNumber)), "episode", .constant(String(data.episodeNumber)), "external_ids")
     }

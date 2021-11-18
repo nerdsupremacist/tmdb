@@ -57,45 +57,9 @@ extension MovieDB.ViewerContext {
         let options: [StreamingOption]
     }
 
-    func searchStreamingOptions(id: Int,
-                                name: String,
-                                contentType: ContentType,
-                                providers: [ID],
-                                countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
-
-        return searchStreamingOptions(providers: providers, countries: countries) { self.streamingOptions(id: id, name: name, contentType: contentType, locale: $0) }
-    }
-
-
-    func searchStreampingOptionsForSeason(showId: Int,
-                                          showName: String,
-                                          seasonNumber: Int,
-                                          providers: [ID],
-                                          countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
-
-        return searchStreamingOptions(providers: providers, countries: countries) { self.streampingOptionsForSeason(showId: showId,
-                                                                                                                    showName: showName,
-                                                                                                                    seasonNumber: seasonNumber,
-                                                                                                                    locale: $0) }
-    }
-
-    func searchStreampingOptionsForEpisode(showId: Int,
-                                           showName: String,
-                                           seasonNumber: Int,
-                                           episodeNumber: Int,
-                                           providers: [ID],
-                                           countries: [ID]?) -> EventLoopFuture<[StreamingResultForProvideer]> {
-
-        return searchStreamingOptions(providers: providers, countries: countries) { self.streampingOptionsForEpisode(showId: showId,
-                                                                                                                     showName: showName,
-                                                                                                                     seasonNumber: seasonNumber,
-                                                                                                                     episodeNumber: episodeNumber,
-                                                                                                                     locale: $0) }
-    }
-
-    private func searchStreamingOptions(providers: [ID],
-                                        countries: [ID]?,
-                                        search: @escaping (String) -> EventLoopFuture<[StreamingOption]?>) -> EventLoopFuture<[StreamingResultForProvideer]> {
+    func searchStreamingOptions(providers: [ID],
+                                countries: [ID]?,
+                                search: @escaping (String) -> EventLoopFuture<[StreamingOption]?>) -> EventLoopFuture<[StreamingResultForProvideer]> {
 
         guard !providers.isEmpty else { return request.eventLoop.future([]) }
         return locales(ids: countries).flatMap { locales in

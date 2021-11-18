@@ -12,14 +12,19 @@ class TVShow: GraphQLObject, Node {
     @LazyInline
     var details: DetailedTVShow
 
+    @InlineAsInterface
+    var streamable: Streamable
+
     init(show: BasicTVShow, viewerContext: MovieDB.ViewerContext) {
         self.show = show
         self._details = LazyInline { viewerContext.tmdb.show(id: show.id) }
+        self.streamable = Streamable { $0.streamingOptions(id: show.id, name: show.name, contentType: .show, locale: $1) }
     }
 
     init(details: DetailedTVShow, viewerContext: MovieDB.ViewerContext) {
         self.show = details
         self._details = LazyInline { viewerContext.request.eventLoop.future(details) }
+        self.streamable = Streamable { $0.streamingOptions(id: details.id, name: details.name, contentType: .show, locale: $1) }
     }
 }
 
