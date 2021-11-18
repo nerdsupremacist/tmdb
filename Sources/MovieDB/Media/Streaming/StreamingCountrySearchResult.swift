@@ -77,7 +77,7 @@ extension MovieDB.ViewerContext {
                 .map { SearchResultsForLocale(locale: locale, options: $0 ?? []) }
         }
         let flattened = request.eventLoop.flatten(searches)
-        let providerIds = providerIds(ids: providers)
+        let providerIds = self.providerIds(ids: providers)
         return providerIds.and(flattened).map { providerIds, results in
             let providerIds = Set(providerIds)
             var byProviderId: [Int : [StreamingCountryOption]] = [:]
