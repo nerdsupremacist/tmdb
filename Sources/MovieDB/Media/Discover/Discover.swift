@@ -144,8 +144,8 @@ struct StreamingOptions: GraphQLInputObject, InputMergable {
         return providers.and(selectedCountry).and(allCountries).map { (selected, allCountries) in
             let (providers, selectedCountry) = selected
             var parameters: [String : String] = [:]
-            let monetizationTypes = monetizationTypes ?? [.flatrate, .free, .ads]
-            parameters["with_watch_monetization_types"] = monetizationTypes.map(\.rawValue).joined(separator: "|")
+            let monetization = monetizationTypes ?? [.flatrate, .free, .ads]
+            parameters["with_watch_monetization_types"] = monetization.map(\.rawValue).joined(separator: "|")
 
             if !providers.isEmpty {
                 parameters["with_watch_providers"] = providers.map(String.init).joined(separator: "|")
