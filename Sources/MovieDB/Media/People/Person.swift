@@ -55,6 +55,10 @@ class Person: GraphQLObject, Node {
             return page.results.first { $0.id == self.person.id }?.knownFor.map { $0.output(viewerContext: viewerContext) } ?? []
         }
     }
+
+    func discover(viewerContext: MovieDB.ViewerContext) -> Discover {
+        return Discover(viewerContext: viewerContext, initialInput: DiscoverInput(people: .init(include: [graphqlID])))
+    }
 }
 
 extension Person: TMDBNode {

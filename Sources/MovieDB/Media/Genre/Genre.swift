@@ -10,12 +10,8 @@ class Genre: Codable, GraphQLObject {
 
     let name: String
 
-    var movies: NestedMovies {
-        return .genre(id: id)
-    }
-
-    var tv: NestedTV {
-        return .genre(id: id)
+    func discover(viewerContext: MovieDB.ViewerContext) -> Discover {
+        return Discover(viewerContext: viewerContext, initialInput: DiscoverInput(genres: .init(include: [graphqlID])))
     }
 }
 

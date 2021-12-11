@@ -14,9 +14,12 @@ protocol TMDBNode: GraphZahl.Node {
 
 extension TMDBNode {
 
+    var graphqlID: ID {
+        return ID(namespace: Self.namespace, ids: [String(self.id)])
+    }
+
     func id(context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<String> {
-        let id = ID(namespace: Self.namespace, ids: [String(self.id)])
-        return eventLoop.future(id.string())
+        return eventLoop.future(graphqlID.string())
     }
 
     static func find(id: String, context: MutableContext, eventLoop: EventLoopGroup) -> EventLoopFuture<GraphZahl.Node?> {
@@ -27,8 +30,8 @@ extension TMDBNode {
 
 }
 
-struct ID {
-    enum Namespace: Int {
+struct ID: Hashable {
+    enum Namespace: Int, Hashable {
         case movie
         case person
         case show
@@ -174,6 +177,46 @@ extension ID {
             }
 
             return (ids[0], ids[1], ids[2])
+        }
+    }
+}
+
+extension Sequence where Element == ID {
+
+    func idValues(for namespace: ID.Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<[Int]> {
+        return eventLoop.tryFuture {
+            var values = [Int]()
+            for id in self {
+                guard id.namespace == namespace else {
+                    throw ID.Error.invalidId(desiredNamespace: namespace)
+                }
+                let ids = id.intIds()
+
+                guard ids.count == 1 else {
+                    throw ID.Error.invalidNumberOfComponents(expected: 1, actual: ids.count)
+                }
+
+                values.append(ids[0])
+            }
+            return values
+        }
+    }
+
+    func idStringValues(for namespace: ID.Namespace, eventLoop: EventLoopGroup) -> EventLoopFuture<[String]> {
+        return eventLoop.tryFuture {
+            var values = [String]()
+            for id in self {
+                guard id.namespace == namespace else {
+                    throw ID.Error.invalidId(desiredNamespace: namespace)
+                }
+
+                guard id.ids.count == 1 else {
+                    throw ID.Error.invalidNumberOfComponents(expected: 1, actual: id.ids.count)
+                }
+
+                values.append(id.ids[0])
+            }
+            return values
         }
     }
 }

@@ -30,4 +30,24 @@ class Streaming: GraphQLObject {
             return self.viewerContext.streamingProviders(locale: locale).map { $0 ?? [] }
         }
     }
+
+    func allProviders() -> EventLoopFuture<[StreamingProvider]> {
+        return viewerContext
+            .countries()
+            .flatMap { countries in
+                let providers = countries.map { self.viewerContext.streamingProviders(locale: $0.locale).map { $0 ?? [] } }
+                return self.viewerContext.request.eventLoop.flatten(providers).map { $0.flatMap { $0 } }
+            }
+            .map { (allProviders: [StreamingProvider]) in
+                var ids: Set<Int> = []
+                var providers: [StreamingProvider] = []
+                for provider in allProviders {
+                    if !ids.contains(provider.id) {
+                        providers.append(provider)
+                        ids.formUnion([provider.id])
+                    }
+                }
+                return providers
+            }
+    }
 }

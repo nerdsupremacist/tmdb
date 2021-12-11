@@ -67,12 +67,8 @@ class ProductionCompany: Decodable, GraphQLObject {
         case originCountry = "origin_country"
     }
 
-    var movies: NestedMovies {
-        return .productionCompany(id: id)
-    }
-
-    var tv: NestedTV {
-        return .productionCompany(id: id)
+    func discover(viewerContext: MovieDB.ViewerContext) -> Discover {
+        return Discover(viewerContext: viewerContext, initialInput: DiscoverInput(companies: .init(include: [graphqlID])))
     }
 }
 

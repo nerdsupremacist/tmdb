@@ -18,8 +18,10 @@ class Network: Decodable, GraphQLObject {
         case originCountry = "origin_country"
     }
 
-    var tv: NestedTV {
-        return .network(id: id)
+    func tv(viewerContext: MovieDB.ViewerContext) -> FullDiscoverTV {
+        return FullDiscoverTV(viewerContext: viewerContext,
+                              initialInput: DiscoverInput(),
+                              initialTVInput: TVDiscoverInput(networks: DiscoverIncludeFilter(include: [graphqlID])))
     }
 }
 

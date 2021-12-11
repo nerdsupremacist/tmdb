@@ -9,12 +9,8 @@ class Keyword: Decodable, GraphQLObject {
 
     let name: String
 
-    var movies: NestedMovies {
-        return .keyword(id: id)
-    }
-
-    var tv: NestedTV {
-        return .keyword(id: id)
+    func discover(viewerContext: MovieDB.ViewerContext) -> Discover {
+        return Discover(viewerContext: viewerContext, initialInput: DiscoverInput(keywords: .init(include: [graphqlID])))
     }
 }
 
