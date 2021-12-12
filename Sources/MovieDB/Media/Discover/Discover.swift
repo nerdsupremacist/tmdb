@@ -350,6 +350,9 @@ class DiscoverMovies: GraphQLObject {
         return parameters().flatMap { parameters in
             var parameters = parameters
             parameters["sort_by"] = "vote_average.desc"
+            if parameters["vote_count.gte"] == nil {
+                parameters["vote_count.gte"] = "100"
+            }
             return self.viewerContext.movies(at: "discover", "movie", query: parameters)
         }
     }
