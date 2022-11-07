@@ -26,7 +26,7 @@ class DetailedMovie: BasicMovie {
     let budget: Int?
     let genres: [Genre]
     let homepage: URL?
-    let imdbID: String
+    let imdbID: String?
     let productionCompanies: [ProductionCompany]
     let productionCountries: [ProductionCountry]
     let revenue: Int?
@@ -41,7 +41,7 @@ class DetailedMovie: BasicMovie {
         genres = try container.decode([Genre].self, forKey: .genres)
         let homepageString = try container.decodeIfPresent(String.self, forKey: .homepage)
         homepage = homepageString.flatMap(URL.init(string:))
-        imdbID = try container.decode(String.self, forKey: .imdbID)
+        imdbID = try container.decodeIfPresent(String.self, forKey: .imdbID)
         productionCompanies = try container.decode([ProductionCompany].self, forKey: .productionCompanies)
         productionCountries = try container.decode([ProductionCountry].self, forKey: .productionCountries)
         revenue = try container.decodeIfPresent(Int.self, forKey: .revenue)
